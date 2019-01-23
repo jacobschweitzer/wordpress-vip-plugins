@@ -887,8 +887,6 @@ if ( ! class_exists( 'WPCOM_Liveblog' ) ) :
 					case 'delete':
 						unset( $flatten[ $id ] );
 						break;
-					default:
-						continue;
 				}
 			}
 
