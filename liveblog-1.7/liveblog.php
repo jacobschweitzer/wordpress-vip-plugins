@@ -846,8 +846,6 @@ final class WPCOM_Liveblog {
 			    case "delete":
 			        unset( $flatten[$id] );
 			        break;
-			    default:
-			        continue;
 			}
 		}
 
