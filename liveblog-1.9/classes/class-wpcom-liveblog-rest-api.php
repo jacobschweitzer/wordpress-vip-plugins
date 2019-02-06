@@ -28,7 +28,7 @@ class WPCOM_Liveblog_Rest_Api {
 
 	public static function build_endpoint_base() {
 
-		if ( ! empty( self::$endpoint_base ) ) {
+		if ( ! empty( self::$endpoint_base ) && apply_filters( 'liveblog_cache_endpoint_base', true ) ) {
 
 			// @codeCoverageIgnoreStart
 			return self::$endpoint_base;
@@ -46,7 +46,7 @@ class WPCOM_Liveblog_Rest_Api {
 			$base = '/?rest_route=/' . self::$api_namespace . '/';
 		}
 
-		return home_url( $base );
+		return apply_filters( 'liveblog_endpoint_base_url', home_url( $base ) );
 
 	}
 
