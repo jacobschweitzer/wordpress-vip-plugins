@@ -34,23 +34,12 @@ class Google_AJAX_Comment_Loading_Plugin {
 		add_filter( 'template_redirect', array( $this, 'template_redirect' ) );
 		add_action( 'wp_ajax_nopriv_google-get-comments', array( $this, 'ajax_handler' ) );
 		add_action( 'wp_ajax_google-get-comments', array( $this, 'ajax_handler' ) );
-		add_filter( 'comment_reply_link', array( $this, 'filter_comment_reply_link' ), 10, 4 );
-	}
-
-	public function filter_comment_reply_link( $link, $args, $comment, $post ) {
-		$onclick = sprintf(
-			'return legacyAddComment.moveForm( "%1$s-%2$s", "%2$s", "%3$s", "%4$s" )',
-			$args['add_below'], $comment->comment_ID, $args['respond_id'], $post->ID
-		);
-		return str_replace( "<a rel='nofollow' ", sprintf( "<a rel='nofollow' onclick='%s' ", $onclick ), $link );
 	}
 
 	public function template_redirect() {
 		if ( is_singular() ) {
 			add_action( 'wp_head', array( $this, 'add_js_vars' ) );
-			wp_deregister_script( 'comment-reply' );
-			wp_register_script( 'google-comment-reply', plugin_dir_url( __FILE__ ) . 'js/legacy-comment-reply.js', array() , 1 );
-			wp_enqueue_script( 'google-ajax-comment-loading', plugin_dir_url( __FILE__ ) . 'js/google-acl.js', array( 'jquery', 'google-comment-reply' ), 1 );
+			wp_enqueue_script( 'google-ajax-comment-loading', plugin_dir_url( __FILE__ ) . 'js/google-acl.js', array( 'jquery' ), 1 );
 			add_filter( 'option_require_name_email', array( $this, 'require_name_email' ) );
 		}
 	}
