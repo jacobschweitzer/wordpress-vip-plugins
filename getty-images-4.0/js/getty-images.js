@@ -27,7 +27,7 @@
 			case 'royaltyfreesubscription':
 				return 'Royalty Free Subscription';
 		}
-	}
+	};
 	/**
 	 * Main controller for the Getty Images panel, which
 	 * is a state within the MediaFrame.
@@ -210,11 +210,11 @@
 			}
 
 			// Get display options from user
-			var display = this.display(image)
-				, align = display.get('align') || 'none'
-				, sizeSlug = display.get('size') || 'full'
-				, sizes = display.get('sizes')
-				, size = sizes[sizeSlug]
+			var display = this.display(image),
+				align = display.get('align') || 'none',
+				sizeSlug = display.get('size') || 'full',
+				sizes = display.get('sizes'),
+				size = sizes[sizeSlug]
 			;
 
 			if(this.get('mode') == 'embed') {
@@ -239,8 +239,8 @@
 					});
 				}
 
-				this.set('embedCode', embed_code)
-				wp.media.editor.insert("\n" + embed_code + "\n");
+				this.set('embedCode', embed_code);
+				this.insertIntoEditor("\n" + embed_code + "\n");
 			} else {
 				var alt = display.get('alt');
 				var caption = display.get('caption');
@@ -277,8 +277,8 @@
 					$container.html( '[caption align="align' + align + '" width="' + size.width + '"]' + $container.html() + caption + '[/caption]' );
 				}
 
-				this.set('image', display)
-				wp.media.editor.insert($container.html());
+				this.set('image', display);
+				this.insertIntoEditor($container.html());
 			}
 		},
 
@@ -300,6 +300,12 @@
 			}
 
 			return displays[attachment.cid];
+		},
+		
+		insertIntoEditor: function(code) {
+			if (!window.wpActiveEditor) window.wpActiveEditor = undefined;
+			wp.media.editor.insert(code);
+			if (window.wpActiveEditor === undefined) delete window.wpActiveEditor;
 		}
 	});
 

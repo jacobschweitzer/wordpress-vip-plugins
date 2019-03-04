@@ -2,8 +2,8 @@
 Contributors: Getty Images
 Tags: image library, media, images, getty
 Requires at least: 3.9
-Tested up to: 5.0
-Stable tag: 4.0.0
+Tested up to: 5.1
+Stable tag: 4.0.1
 License: GPLv2 or later
 
 Search and use Getty Images photos in your posts without ever leaving WordPress.
@@ -49,6 +49,13 @@ Using the plugin once installed
 3. Click on "Getty Images" in edit post screen to browse the Getty Images library.
 
 == Changelog ==
+
+= 4.0.1 =
+* Bug fix: Refinement panel no longer extends beyond screen
+* Big fix: Image alt text no longer missing in embeds
+* Bug fix: Fixed error that prevented plugin window from closing when embedding images
+* Modal now closes when selected featured image
+* Improved error handling
 
 = 4.0.0 =
 * Add Gutenberg block support

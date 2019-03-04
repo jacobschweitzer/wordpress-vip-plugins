@@ -91,6 +91,7 @@ const renderBlock = function({ imgURL, imgID, imgAlt, imgCaption, embedCode }) {
 	} else if (imgURL) {
 		return el('figure', null, [
 			el('img', { src: imgURL, alt: imgAlt }),
+			(imgAlt && imgAlt !== "") ? el('figcaption', null, imgAlt ) : null
 		]);
 	}
 }

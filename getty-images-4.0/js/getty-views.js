@@ -1158,6 +1158,8 @@
 			else if (downloadOption === "download-as-featured") {
 				this.options.gettyBrowser.download(function (response) {
 					self.setFeaturedImage(response.id);
+					$('.media-modal-close').trigger('click');
+					// Clicks the close button; will need to be updated if a case arises where this close button changes
 				});
 			}
 			else if (downloadOption === "download-and-insert") {

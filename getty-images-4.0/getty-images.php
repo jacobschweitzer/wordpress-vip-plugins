@@ -5,7 +5,7 @@ Plugin URI: http://www.oomphinc.com/work/getty-images-wordpress-plugin/
 Description: Integrate your site with Getty Images
 Author: gettyImages
 Author URI: http://gettyimages.com/
-Version: 4.0.0
+Version: 4.0.1
 */
 
 /*  Copyright 2014  Getty Images
@@ -470,7 +470,7 @@ class Getty_Images {
 	}
 
 	static function isWPcom() {
-		return function_exists( 'wpcom_is_vip' ) && wpcom_is_vip();
+		return (defined('WPCOM_IS_VIP_ENV') && WPCOM_IS_VIP_ENV);
 	}
 
 	/**
@@ -558,12 +558,12 @@ class Getty_Images {
 
         $response = wp_safe_remote_get( $url, array( 'timeout' => $timeout, 'stream' => true, 'filename' => $tmpfname ) );
 
-        preg_match("/filename=([^*]+)/", $response['headers']['content-disposition'], $filename);
-
         if ( is_wp_error( $response ) ) {
             unlink( $tmpfname );
             return $response;
         }
+
+        preg_match("/filename=([^*]+)/", $response['headers']['content-disposition'], $filename);
 
         if ( 200 != wp_remote_retrieve_response_code( $response ) ){
             unlink( $tmpfname );
@@ -600,7 +600,7 @@ class Getty_Images {
 			$this->ajax_error( __( "Missing image URL", 'getty-images' ) );
 		}
 
-		$url = sanitize_url( $_POST['url'] );
+		$url = esc_url_raw( $_POST['url'] );
 
 		if( empty( $url ) ) {
 			$this->ajax_error( __( "Invalid image URL", 'getty-images' ) );

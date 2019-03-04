@@ -39,7 +39,7 @@
 			}
 
 	.have-refinements.refining .getty-refine {
-		height: 100%;
+		height: auto;
 	}
 	.have-refinements.refining .getty-results {
 		/*left: 200px; */
