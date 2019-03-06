@@ -16,6 +16,7 @@ class WPCOM_Geo_Uniques {
 	private static $default_location = 'default';
 	private static $supported_locations = array();
 	private static $simple_mode = true;
+	private static $user_location;
 
 	static function after_setup_theme() {
 		if ( is_admin() )
@@ -30,7 +31,7 @@ class WPCOM_Geo_Uniques {
 		// Add default to list of supported countries
 		self::add_location( self::get_default_location() );
 
-		// If the theme hasn't registered any locations, bail. 
+		// If the theme hasn't registered any locations, bail.
 		$locations = self::get_registered_locations();
 		if ( count( $locations ) <= 1 )
 			return;
@@ -135,18 +136,17 @@ class WPCOM_Geo_Uniques {
 	}
 
 	static function get_user_location() {
-		static $user_location;
 
-		if ( isset( $user_location ) )
-			return $user_location;
+		if ( isset( static::$user_location ) )
+			return static::$user_location;
 
 		if ( static::$simple_mode && ! self::user_has_location_cookie() ) {
-			$user_location = self::get_user_location_from_global( '$_SERVER[ "GEOIP_COUNTRY_CODE" ]' );
+			static::$user_location = self::get_user_location_from_global( '$_SERVER[ "GEOIP_COUNTRY_CODE" ]' );
 		} else {
-			$user_location = self::get_user_location_from_global( sprintf( '$_COOKIE[ "%s" ]', static::COOKIE_NAME ) );
+			static::$user_location = self::get_user_location_from_global( sprintf( '$_COOKIE[ "%s" ]', static::COOKIE_NAME ) );
 		}
 
-		return $user_location;
+		return static::$user_location;
 	}
 
 	static function get_user_location_from_global( $global_var ) {
@@ -222,7 +222,7 @@ class WPCOM_Geo_Uniques {
 			vary_cache_on_function( $test );
 		}
 
-		$test_func = create_function( '', $test );
+		$test_func = @create_function( '', $test );
 		return $test_func();
 	}
 }
