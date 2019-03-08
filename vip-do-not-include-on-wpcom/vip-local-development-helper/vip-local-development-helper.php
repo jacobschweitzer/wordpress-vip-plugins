@@ -735,3 +735,12 @@ function wpcom_vip_load_wp_rest_api() {
 		do_action( 'rest_api_init' );
 	}
 }
+
+/**
+ * Dummy function for wpcom_vip_async_rlogin() being called in vip-helper-wpcom.php.
+ */
+if ( ! ( function_exists( 'wpcom_is_vip' ) && wpcom_is_vip() ) && ! function_exists( 'wpcom_vip_remove_remote_login' ) ) {
+	function wpcom_vip_remove_remote_login() {
+		// Do nothing.
+	}
+}
