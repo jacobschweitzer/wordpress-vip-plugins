@@ -443,16 +443,6 @@ class Syndication_WP_XMLRPC_Client extends WP_HTTP_IXR_Client implements Syndica
 	{
 		// TODO: Implement get_posts() method.
 	}
-
-	/**
-	 * Call this before doing debug of the instance to avoid accidental disclosure
-	 *
-	 * @return void
-	 */
-	function null_creds() {
-		$this->username = null;
-		$this->password = null;
-	}
 }
 
 class Syndication_WP_XMLRPC_Client_Extensions {

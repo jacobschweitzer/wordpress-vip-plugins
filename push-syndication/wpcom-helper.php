@@ -16,40 +16,6 @@ add_action( 'syn_after_init_server', function() {
 	// TODO: override schedule_delete_content and schedule_pull_content
 } );
 
-// Failure notifications
-add_action( 'syn_post_push_new_post', 'wpcom_vip_push_syndication_debug', 999, 6 );
-add_action( 'syn_post_push_edit_post', 'wpcom_vip_push_syndication_debug', 999, 6 );
-
-function wpcom_vip_push_syndication_debug( $result, $post_id, $site, $transport_type, $client, $info ) {
-	if ( is_wp_error( $result ) && function_exists( 'has_blog_sticker' ) && has_blog_sticker( 'vip-client-cbs-local' ) ) {
-		$info = [
-			'result'         => $result,
-			'post_id'        => $post_id,
-			'site'           => $site,
-			'transport_type' => $transport_type,
-			'info'           => $info,
-			'timestamp_gmt'      => current_time( 'Y-m-d H:i:s', true ),
-			'timestamp_local'      => current_time( 'Y-m-d H:i:s', false ),
-		];
-
-		// Prevent credentials disclosure
-		if ( is_callable( [ $client, 'null_creds' ] ) ) {
-			$client->null_creds();
-			$info['client'] = $client;
-		}
-
-		$bname = 'CBS Syn Watcher';
-		
-		$result = 'SYNDICATION FAIL: ';
-		$msg = var_export( $info, true );
-		
-		a8c_slack( '#vip-client-cbs-logs',  $result . $msg, $bname );
-		if ( function_exists( 'wp_debug_mail' ) ) {
-			wp_debug_mail( 'rinat+wpcomdebug@automattic.com', $result, $msg, [], 60 );
-		}
-	}
-}
-
 // === Stats ===
 add_action( 'syn_post_pull_edit_post', function() {
 	wpcom_push_syndication_stats( 'vip-syndication-pull', 'edit' );
