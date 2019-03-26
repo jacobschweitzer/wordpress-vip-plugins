@@ -11,8 +11,6 @@ License: GPL2
 ---
 
 v0.7.2-wpcom is v0.7.2 from the WordPress.org plugin directory with coding standards, etc. improvements
-The full log of changes is here:
-https://vip-review-trac.wordpress.com/changeset?reponame=&new=711%40plugins%2Fgoogle-calendar-events&old=629%40plugins%2Fgoogle-calendar-events
 
 ---
 
