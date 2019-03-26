@@ -413,7 +413,6 @@ function news_sitemap_uri() {
  * A list or HTTP endpoints for a sitemap ping
  *
  * Note: disabled ping to http://submissions.ask.com/ping?sitemap=
- * See http://systemattic.wordpress.com/2010/02/11/sitemap-jobs-queue-showed-up-in-nagios/
  *
  * @return array List of endpoints waiting for a URI append
  */
