@@ -1,9 +1,6 @@
 # VIP Staging Sites
-*GM 2015 Project*
 
 The goal of this project is to provide our VIP clients a quick and easy way to stage sites on WordPress.com.
-
-More info on the [P2 Thread](https://keepingtheirblogsgoing.wordpress.com/2015/10/09/gm-project-quick-and-dirty-staging-for-all-vips/)
 
 ### How to use
 
