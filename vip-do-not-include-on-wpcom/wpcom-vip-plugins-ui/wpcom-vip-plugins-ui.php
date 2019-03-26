@@ -141,7 +141,7 @@ class WPcom_VIP_Plugins_UI {
 			'internacional', // Not ready yet (ever?)
 			'wpcom-profiler', // Used internally to debug sites
 			'wpcom-legacy-redirector', // requires code-level changes
-			'maintenance-mode', // Doesn't work via UI - https://keepingtheirblogsgoing.wordpress.com/2016/03/15/maintenance-mode-should-be-removed-from-vip-dashboard/
+			'maintenance-mode', // Doesn't work via UI
 
 			// Premium
 			'new-device-notification',
@@ -169,7 +169,7 @@ class WPcom_VIP_Plugins_UI {
 			'daylife', // API doesn't work #36756-z
 			'feedwordpress', // breaks all the time
 			'findthebest', // replaced by Graphiq Search due to comapny rebranding
-			'google-calendar-events', // https://viprequests.wordpress.com/2015/01/06/update-google-calendar-events-shared-plugin/
+			'google-calendar-events',
 			'ice', // Crazy out-of-date, doesn't work with MCE 4+, still in use by a handful for some reason
 			'livefyre', // use livefyre3 instead
 			'search-excerpt', // out-of-date and not widely used
@@ -179,7 +179,7 @@ class WPcom_VIP_Plugins_UI {
 			'wpcom-related-posts', // Now part of JP / WP.com
 			'livefyre-apps', 'livefyre3', // http://wp.me/poqVs-eiD
 
-			// The great deprecation of 2016 https://keepingtheirblogsgoing.wordpress.com/2016/04/29/whats-the-status-of-roost/#comment-79726
+			// The great deprecation of 2016
 			'postrelease-vip',
 			'breadcrumb-navxt-39',
 			'wp-frontend-uploader',
