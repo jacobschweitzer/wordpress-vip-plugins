@@ -862,13 +862,6 @@ Author URI: http://intensedebate.com
 
 			$this->compact_operations();
 
-/*
-			if ( 3508545 == $GLOBALS['wpdb']->blogid && !mt_rand( 0, 99 ) ) {
-				xmpp_message( 'mdawaffe@im.wordpress.com', print_r( debug_backtrace( false ), 1 ) );
-				xmpp_message( 'mdawaffe@im.wordpress.com', print_r( $this->mda_raw_results, 1 ) );
-			}
-*/
-
 			$queue_async = false;
 			if ( 'id_request_queue' == $this->queueName ) {
 				// A non-jobs process has decided to store the queue (it couldn't process all the ops for some reason)
