@@ -389,8 +389,6 @@ class Livefyre_Display {
                 echo '<script type="text/javascript" data-lf-domain="' . esc_attr( $network ) . '" id="ncomments_js" src="' . esc_url( $this->lf_core->assets_url ) .'/wjs/v1.0/javascripts/CommentCount.js"></script>';
             }
         } catch ( Exception $error ) {
-            // do nothing but silence the jsonEncode utf-8 error see http://99deploys.wordpress.com/2014/05/27/these-fatal-errors-have-been/
-            // http://99deploys.wordpress.com/2014/05/21/i-got-99-fatals-and/
             return false;
         }
     }
