@@ -43,7 +43,6 @@ if ( function_exists( 'Enterprise' ) ) {
 
 /**
  * We want to let Elasticsearch know that it should search the author taxonomy's name as a search field
- * See: https://elasticsearchp2.wordpress.com/2015/01/08/in-36757-z-vanguard-says-they/
  *
  * @param $es_wp_query_args The ElasticSearch Query Parameters
  * @param $query
