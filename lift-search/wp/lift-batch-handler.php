@@ -187,7 +187,7 @@ if ( !class_exists( 'Lift_Batch_Handler' ) ) {
 								$html .= '</tr>';
 							}
 						default:
-							continue;
+							break;
 					}
 				}
 				$big = 999999999;

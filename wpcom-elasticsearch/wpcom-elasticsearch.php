@@ -856,7 +856,7 @@ class WPCOM_elasticsearch {
 
 						case 'month':
 							if ( empty( $_GET['year'] ) || empty( $_GET['monthnum'] ) ) {
-								continue;
+								continue 3;
 							}
 
 							$filters[] = array(
@@ -870,7 +870,7 @@ class WPCOM_elasticsearch {
 						case 'day':
 
 							if ( empty( $_GET['year'] ) || empty( $_GET['monthnum'] ) || empty( $_GET['day'] ) ) {
-								continue;
+								continue 3;
 							}
 
 							$filters[] = array(
