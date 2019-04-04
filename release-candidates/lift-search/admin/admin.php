@@ -342,7 +342,7 @@ class Lift_Admin {
 					}
 					break;
 				default:
-					continue;
+					break;
 			}
 		}
 
