@@ -279,7 +279,7 @@ abstract class Fieldmanager_Options extends Fieldmanager_Field {
 	 * @return array list of meta boxes to remove
 	 */
 	protected function add_meta_boxes_to_remove( &$meta_boxes_to_remove ) {
-		if ( $this->remove_default_meta_boxes && get_class( $this->datasource ) == 'Fieldmanager_Datasource_Term' ) {
+		if ( $this->remove_default_meta_boxes && $this->datasource instanceof \Fieldmanager_Datasource_Term ) {
 			// Iterate over the list and build the list of meta boxes
 			$meta_boxes = array();
 			foreach( $this->datasource->get_taxonomies() as $taxonomy ) {
