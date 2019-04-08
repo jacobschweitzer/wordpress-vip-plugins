@@ -11,7 +11,7 @@ Author URI:  http://automattic.com/
 Version:     1.2
 
 **************************************************************************
-fdfdfdddd
+
 Copyright (C) 2012-2013 Automattic
 
 This program is free software; you can redistribute it and/or modify
@@ -298,9 +298,6 @@ class WPCOM_elasticsearch {
 		// You can use this filter to modify the search query parameters, such as controlling the post_type.
 		// These arguments are in the format for wpcom_search_api_wp_to_es_args(), i.e. WP-style.
 		$es_wp_query_args = apply_filters( 'wpcom_elasticsearch_wp_query_args', $es_wp_query_args, $query );
-		if ( ! empty( $this->facets ) ) {
-			$es_wp_query_args['aggregations'] = $this->facets;
-		}
 		$es_wp_query_args['post_status'] = "publish";
 		// Convert the WP-style args into ES args
 		$es_query_args = wpcom_search_api_wp_to_es_args( $es_wp_query_args );
