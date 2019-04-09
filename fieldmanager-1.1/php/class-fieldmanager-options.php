@@ -88,7 +88,7 @@ abstract class Fieldmanager_Options extends Fieldmanager_Field {
 	 */
 	public function add_options( $options ) {
 		// VIP: bail if not an array, the code operates under assumption it is. 
-		if ( is_array( $options ) )
+		if ( !is_array( $options ) )
 			return;
 			
 		$values = array_values( $options );
