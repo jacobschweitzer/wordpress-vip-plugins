@@ -2,7 +2,7 @@
 /*
 Plugin Name: CoSchedule
 Description: Plan, organize, and execute every content marketing project in one place with CoSchedule, an all-in-one content marketing editorial calendar solution.
-Version: 3.2.2
+Version: 3.2.7
 Author: CoSchedule
 Author URI: http://coschedule.com/
 Plugin URI: http://coschedule.com/
@@ -23,7 +23,7 @@ if ( ! class_exists( 'tm_coschedule' ) ) {
         private $webhooks_url = "https://webhooks.coschedule.com";
         private $app = "https://app.coschedule.com";
         private $assets = "https://assets.coschedule.com";
-        private $version = "3.2.2";
+        private $version = "3.2.7";
         private $build;
         private $connected = false;
         private $token = false;
@@ -47,7 +47,7 @@ if ( ! class_exists( 'tm_coschedule' ) ) {
             register_deactivation_hook( __FILE__, array( $this, 'deactivation' ) );
 
             // Load variables
-            $this->build                  = intval( "82" );
+            $this->build                  = intval( "87" );
             $this->token                  = get_option( 'tm_coschedule_token' );
             $this->calendar_id            = get_option( 'tm_coschedule_calendar_id' );
             $this->wordpress_site_id      = get_option( 'tm_coschedule_wordpress_site_id' );
@@ -303,6 +303,7 @@ if ( ! class_exists( 'tm_coschedule' ) ) {
 
             // Check if connected
             if ( true === $this->connected ) {
+                $redirect = 'schedule';
                 include( plugin_dir_path( __FILE__ ) . 'frame.php' );
             } else {
                 $this->plugin_settings_scripts();
@@ -341,7 +342,10 @@ if ( ! class_exists( 'tm_coschedule' ) ) {
                     array( &$this, 'meta_box_insert' ),     // Callback function
                     $post_type,                             // Admin page (or post type)
                     'normal',                               // Context
-                    'default'                               // Priority
+                    'default',                              // Priority
+                    array(                                  // callback_args
+                        '__block_editor_compatible_meta_box' => true,
+                    )
                 );
             }
         }
@@ -1205,11 +1209,13 @@ if ( ! class_exists( 'tm_coschedule' ) ) {
         /**
          * Get array of all attachments of the post
          *
-         * @param $content
+         * @param $post_content
          *
          * @return array
          */
-        public function get_attachments( $content ) {
+        public function get_attachments( $post_content ) {
+            // Allow external plugins to filter the post content as needed for plugin or theme compatibility
+            $content = apply_filters( 'tm_coschedule_get_attachments_content', $post_content );
             $attachments = array();
 
             preg_match_all( '/<img[^>]+>/i', $content, $images );
@@ -1394,7 +1400,8 @@ if ( ! class_exists( 'tm_coschedule' ) ) {
          * @param $post_id
          */
         public function sync_post_callback( $post_id ) {
-            if ( true === $this->connected && ! wp_is_post_revision( $post_id ) ) {
+            $filter_result = apply_filters( 'tm_coschedule_sync_post_callback_filter', true, $post_id );
+            if ( true === $this->connected && ! wp_is_post_revision( $post_id ) && $filter_result ) {
                 $post      = $this->get_full_post( $post_id );
                 $post_type = $this->get_value_or_default( $post['post_type'], 'post' );
 
@@ -1588,7 +1595,11 @@ if ( ! class_exists( 'tm_coschedule' ) ) {
 
             $are_numeric = ( is_numeric( $this->build ) && is_numeric( $this->synced_build ) );
 
-            return ( $are_numeric && intval( $this->build ) > intval( $this->synced_build ) );
+            if ( false === $are_numeric) {
+                return true;
+            }
+
+            return ( intval( $this->build ) !== intval( $this->synced_build ) );
         }
 
         /**
@@ -1596,16 +1607,21 @@ if ( ! class_exists( 'tm_coschedule' ) ) {
          */
         public function save_build_callback() {
             if ( true === $this->connected ) {
-                // Update a tracking option in wordpress
-                if ( true === update_option( 'tm_coschedule_synced_build', $this->build ) ) {
+                // Post new info to api
+                $params            = array();
+                $params['build']   = $this->build;
+                $params['version'] = $this->version;
+                $out               = $this->post_webhook( '/webhooks/wordpress/keys/build/save?_wordpress_key=' . $this->token, $params );
 
-                    // Post new info to api
-                    $params            = array();
-                    $params['build']   = $this->build;
-                    $params['version'] = $this->version;
-                    $this->post_webhook( '/webhooks/wordpress/keys/build/save?_wordpress_key=' . $this->token, $params );
+                if ( is_wp_error( $out ) ) {
+                    return false;
                 }
+
+                // Update a tracking option in wordpress
+                return update_option( 'tm_coschedule_synced_build', $this->build );
             }
+
+            return false;
         }
 
         /**

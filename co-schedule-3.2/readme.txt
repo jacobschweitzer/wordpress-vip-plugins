@@ -3,50 +3,57 @@ Contributors: CoSchedule
 Donate link: http://coschedule.com
 Tags: Content marketing calendar, drag and drop editorial calendar plugin, social media scheduling, editorial calendar plugin, content marketing, social automation tool, pinterest integration, schedule facebook posts, schedule to twitter, social media, tumblr, schedule posts to google+, schedule posts to Linkedin, Google Analytics, social media analytics, Google Docs integration, Evernote integration, Click to Tweet
 Requires at least: 3.5
-Tested up to: 4.9.6
-Stable tag: 3.2.2
+Tested up to: 5.2.0
+Stable tag: 3.2.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-CoSchedule is an editorial calendar for your content marketing and social scheduling. Take control of your content strategy and consolidate your tools into one content marketing editorial calendar with CoSchedule.
+The only marketing suite that helps you organize all of your marketing in one place.
 
 
 == Description ==
 
-CoSchedule is your **all-in-one editorial calendar** for planning, promoting, and executing your entire marketing strategy. You can get everything organized in ONE place, create a unified workflow for every project, easily collaborate with your team using custom workflows, build the perfect social schedule (directly in your calendar), integrate CoSchedule with your favorite tools, AND gain insight into your efforts with powerful analytics.
+CoSchedule is **the only way to organize your marketing in one place**. As a family of agile marketing products, CoSchedule serves more than 7,000+ customers worldwide, helping you stay focused, deliver projects on time, and keep your entire marketing team happy.
 
-##### [Start your 14 day free trial today >>>](http://coschedule.com/sign-up)
-
-
-
-### See Everything Organized In ONE Place
-
-* **Get a bird's eye view of your entire marketing strategy.** Plan (and easily reschedule) your blog posts, marketing content, and social media in one place using CoSchedule's drag + drop calendar.
-* **Organize the calendar, your way.** Use helpful icons to categorize your content, custom color labels for easy filtering, and create saved calendar views to sort your content (and find what you need...faster).
+As one of the top 15 leading software providers on the Inc. 5000 list and recognized in Gartner’s 2019 Magic Quadrant for Content Marketing Platforms, CoSchedule is the fastest-growing solution for mid-market and enterprise companies seeking a unified marketing platform.
 
 
-### Create A Unified Workflow For *Every* Project
-
-* **Simplify your team's workflows & collaboration.** No more fire drills, gaps in communication, and information silos! Proactively plan out your entire roadmap, assign + approve tasks, add comments, get real-time visibility, and maximize your resources inside a collaborative, cross-functional calendar!
-
-### Build The Perfect Social Schedule (Directly In Your Calendar)
-
-* **Create social messages directly in CoSchedule.** Create messages, add links + images, and publish to all your favorite networks from your calendar.
-* **Publish at the best time, everytime.** Schedule with confidence with Best Time Scheduling, knowing your messages are being sent at the best time possible - according to research and best practices - for increased traffic, engagement, and followers.
-* **Set it and forget it with ReQueue - the only social automation tool with built-in intelligence.** No more getting stuck in the weeds of social! Create your messages, add them to ReQueue, and let CoSchedule intelligently send them out at the best possible traffic times for each network.
-
-### Integrate CoSchedule With Your Favorite Tools
-
-* **No more jumping from screen to screen to manage your tools!** CoSchedule integrates with the tools you love, giving you powerful options for editing content, tracking your success, simplifying your workflows, more!
-
-### Gain Insight Into Your Efforts With Powerful Analytics
-
-* **Prove your ROI with data driven results.** No more warm fuzzies! Prove the value of all your hard work with real data! Utilize CoSchedule's social profile analytics to measure your success and get a holistic view of your entire marketing strategy.
+##### [Start your 14-day free trial today!](http://coschedule.com/sign-up)
 
 
-##### [Start your 14 day free trial today >>>](http://coschedule.com/sign-up)
 
-https://vimeo.com/258652532
+Want to learn more about the CoSchedule Suite?
+
+
+### Marketing Calendar
+
+Cross-functional calendar that brings global visibility to all of your projects. Create a unified workflow for every project inside the calendar for content, social, email, events, and more.
+
+### Content Organizer
+
+Helps your team ideate, plan, create, and publish in one place. Organize your entire editorial calendar while integrating with your blog, email, and social platforms.
+
+### Work Organizer
+
+Consolidates team resource planning and project management to help you complete every project on time. Create custom statuses to describe the unique stages of your team’s workflows and visualize the entire process in a Kanban board.
+
+### Social Organizer
+
+Visualize your entire social strategy in one place, from publishing to measurement. Create large-scale campaigns in seconds, use Best Time Scheduling, and fill out your social calendar via ReQueue social automation.
+
+### Asset Organizer
+
+Gives teams access to the resources and brand assets they need to complete projects to organize and share everything they create.
+
+### Integrate CoSchedule with Your Favorite Tools
+
+No more jumping from screen to screen to manage your tools! CoSchedule integrates with the tools you love, giving you powerful options for editing content, tracking your success, simplifying your workflows, more!
+
+
+##### [Schedule a demo today!](https://coschedule.com/product-demo)
+
+
+https://vimeo.com/331016396
 
 
 == Installation ==
@@ -72,7 +79,7 @@ You can install CoSchedule via the WordPress.org plugin directory or manually by
 
 ##### What is CoSchedule?
 
-CoSchedule is the **all-in-one editorial calendar** for marketers to plan, publish, and execute their entire marketing strategy. [Learn more here](http://coschedule.com/).
+CoSchedule is the only way to organize your marketing in one place. As a family of agile marketing products, CoSchedule serves more than 7,000+ customers worldwide, helping you stay focused, deliver projects on time, and keep your entire marketing team happy. As one of the top 15 leading software providers on the Inc. 5000 list and recognized in Gartner’s 2019 Magic Quadrant for Content Marketing Platforms, CoSchedule is the fastest-growing solution for mid-market and enterprise companies seeking a unified marketing platform. [Learn more here](http://coschedule.com/).
 
 ##### How does the CoSchedule plug-in work?
 
@@ -84,11 +91,26 @@ After you [sign up for an account at CoSchedule](https://coschedule.com/signup),
 
 ##### How much does CoSchedule cost?
 
-CoSchedule has several subscription plans to choose from, starting at $40/month. [Choose the right plan for you + your team](https://coschedule.com/pricing).
+CoSchedule has several subscription plans to choose from, starting at $80/month. [Choose the right plan for you + your team](https://coschedule.com/pricing).
 
 == Screenshots ==
 
 == Changelog ==
+= 3.2.7 =
+* Fixes a bug that may prevent plugin build version from syncing with CoSchedule
+
+= 3.2.6 =
+* Adds a new optional filter for conditional post syncing
+
+= 3.2.5 =
+* Minor updates for better Gutenberg compatibility.
+
+= 3.2.4 =
+* Fixes a minor PHP notification bug.
+
+= 3.2.3 =
+* Adds a new optional filter for external plugin compatibility of post content attachments when syncing
+
 = 3.2.2 =
 * Updates for WordPress VIP standards
 
@@ -329,6 +351,21 @@ CoSchedule has several subscription plans to choose from, starting at $40/month.
 * Private beta release
 
 == Upgrade Notice ==
+= 3.2.7 =
+* Fixes a bug that may prevent plugin build version from syncing with CoSchedule
+
+= 3.2.6 =
+* Adds a new optional filter for conditional post syncing
+
+= 3.2.5 =
+* Minor updates for better Gutenberg compatibility.
+
+= 3.2.4 =
+* Fixes a minor PHP notification bug.
+
+= 3.2.3 =
+* Adds a new optional filter for external plugin compatibility of post content attachments when syncing
+
 = 3.2.2 =
 * Updates for WordPress VIP standards
 
