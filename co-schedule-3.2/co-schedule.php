@@ -1046,8 +1046,9 @@ if ( ! class_exists( 'tm_coschedule' ) ) {
 
                     /** @noinspection PhpIncludeInspection */
                     /** @noinspection PhpUndefinedMethodInspection */
+                    // VIP: Changing filename to work with WordPress.com
                     $plugins_path = trailingslashit( $wp_filesystem->wp_plugins_dir() );
-                    require_once( $plugins_path . 'jetpack/modules/markdown/easy-markdown.php' );
+                    require_once( $plugins_path . 'easy-markdown/easy-markdown.php' );
 
                     if ( class_exists( 'WPCom_Markdown' ) ) {
                         /** @noinspection PhpUndefinedClassInspection */
