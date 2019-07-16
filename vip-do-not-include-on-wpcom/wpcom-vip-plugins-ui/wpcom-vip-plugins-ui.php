@@ -353,7 +353,8 @@ class WPcom_VIP_Plugins_UI {
 			if ( has_blog_sticker( 'vip-plugins-ui-rc-plugins' ) ) {
 				wpcom_vip_load_plugin( $plugin, 'plugins', true );
 			} else {
-				wpcom_vip_load_plugin( $plugin );
+				$parsed_plugin = $this->parse_slug_and_version( $plugin );
+				wpcom_vip_load_plugin( $parsed_plugin['slug'], 'plugins', $parsed_plugin['version'] );
 			}
 		}
 	}
@@ -607,7 +608,28 @@ class WPcom_VIP_Plugins_UI {
 	 * @return bool True if valid, false if not.
 	 */
 	public function validate_plugin( $plugin ) {
-		return ( 0 === validate_file( $plugin ) && ( file_exists( $this->plugin_folder . '/' . $plugin . '/' . $plugin . '.php' ) || file_exists( $this->plugin_folder . '/release-candidates/' . $plugin . '/' . $plugin . '.php' ) ) );
+		$parsed_plugin = $this->parse_slug_and_version( $plugin );
+
+		return ( 0 === validate_file( $plugin ) && ( file_exists( $this->plugin_folder . '/' . $parsed_plugin['versioned_slug'] . '/' . $parsed_plugin['slug'] . '.php' ) || file_exists( $this->plugin_folder . '/release-candidates/' . $parsed_plugin['versioned_slug'] . '/' . $parsed_plugin['slug'] . '.php' ) ) );
+	}
+	
+	/**
+	 * Helper method to parse the plugin's slug and version.
+	 *
+	 * @param string $plugin version(ed|less) slug. E.g. my-plugin-2.0
+	 * @return array [ 'slug' => $slug, 'version' => $version, 'versioned_slug' => $versioned_slug ]
+	 */
+	public function parse_slug_and_version( string $plugin ): array {
+		// We need to parse out slug and version, generally speaking version part is your typical software version,
+		// But there are some special snowflakes.
+		preg_match( '/(?P<slug>[-_a-zA-Z]+)(?P<version>[\.\d\-]+(beta|mod|WPCOM)?)?/i', $plugin, $matches );
+		
+		// The above regex will match trailing `-`, we don't want that
+		$slug = rtrim( $matches['slug'], '-' );
+		$version = $matches['version'] ?? '';
+		
+		$versioned_slug = $slug . ( $version ? "-{$version}" : '' );
+		return compact( 'slug', 'version', 'versioned_slug' );
 	}
 
 	/**
