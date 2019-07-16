@@ -354,7 +354,10 @@ class WPcom_VIP_Plugins_UI {
 				wpcom_vip_load_plugin( $plugin, 'plugins', true );
 			} else {
 				$parsed_plugin = $this->parse_slug_and_version( $plugin );
-				wpcom_vip_load_plugin( $parsed_plugin['slug'], 'plugins', $parsed_plugin['version'] );
+				if ( $parsed_plugin['version'] )
+					wpcom_vip_load_plugin( $parsed_plugin['slug'], 'plugins', $parsed_plugin['version'] );
+				else
+					wpcom_vip_load_plugin( $parsed_plugin['slug'] );
 			}
 		}
 	}
