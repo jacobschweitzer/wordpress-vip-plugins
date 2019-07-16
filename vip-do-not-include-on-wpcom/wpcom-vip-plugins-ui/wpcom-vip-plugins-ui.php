@@ -552,7 +552,7 @@ class WPcom_VIP_Plugins_UI {
 			return 'option';
 		elseif ( in_array( 'plugins/' . $plugin, wpcom_vip_get_loaded_plugins() ) )
 			return 'manual';
-
+		
 		/*
 		 Dirty check for versioned plugins.  Not all plugins will
 		 have a '-' in their slug, but ALL versioned plugins do.
@@ -561,15 +561,9 @@ class WPcom_VIP_Plugins_UI {
 		 string. ex: brightcove (hidden) and brightcove-video-connect
 		 */
 		if ( false !== strpos( $plugin, '-' ) ) {
-			// Loop through and match versioned plugins.
-			foreach ( $this->get_active_plugins_option() as $active_plugin ) {
-				if ( 0 === strpos( $active_plugin, $plugin ) ) {
-					return 'option';
-				}
-			}
 
 			foreach ( wpcom_vip_get_loaded_plugins() as $active_plugin ) {
-				if ( 0 === strpos( $active_plugin, 'plugins/' . $plugin ) && array_key_exists($plugin, $this->fpp_plugins ) ) {
+				if ( 0 === strpos( $active_plugin, 'plugins/' . $plugin ) && array_key_exists( $plugin, $this->fpp_plugins ) ) {
 					return 'manual';
 				}
 			}
@@ -588,13 +582,28 @@ class WPcom_VIP_Plugins_UI {
 	public function add_activate_or_deactive_action_link( $actions, $plugin ) {
 		$is_active = WPcom_VIP_Plugins_UI()->is_plugin_active( $plugin );
 
+		$parsed_plugin = $this->parse_slug_and_version( $plugin );
+		
+		$other_versions_active_option = array_filter( (array) $this->get_active_plugins_option(), function( $p ) use ( $parsed_plugin ) {
+			return false !== stripos( $p, $parsed_plugin['slug'] );
+		} );
+
+		$other_versions_active_manual = array_filter( (array) wpcom_vip_get_loaded_plugins(), function( $p ) use ( $parsed_plugin ) {
+			return false !== stripos( $p, $parsed_plugin['slug'] );
+		} );
+
 		if ( $is_active ) {
 			if ( 'option' == $is_active ) {
 				$actions['deactivate'] = '<a href="' . esc_url( WPcom_VIP_Plugins_UI()->get_plugin_deactivation_link( $plugin ) ) . '" title="' . esc_attr__( 'Deactivate this plugin' ) . '">' . __( 'Deactivate' ) . '</a>';
 			} elseif ( 'manual' == $is_active ) {
 				$actions['deactivate-manually'] = '<span title="To deactivate this particular plugin, edit your theme\'s functions.php file">' . __( "Enabled via your theme's code" ) . '</span>';
 			}
+		} elseif ( count( $other_versions_active_option ) ) {
+			$actions['deactivate-other-versions'] = '<span title="A different version is active, please deactivate it first.">' . __( "A different version is active, please deactivate it first." ) . '</span>';
+		} elseif ( count( $other_versions_active_manual ) ) {
+			$actions['deactivate-other-versions'] = '<span title="A different version is loaded in your codebase, please remove the corresponding wpcom_vip_load_plugin call.">' . __( "A different version is loaded in your codebase, <br/> please remove the corresponding wpcom_vip_load_plugin call." ) . '</span>';
 		}
+		
 
 		// Only show activation links if they aren't disabled
 		elseif ( ! $this->activation_disabled ) {
