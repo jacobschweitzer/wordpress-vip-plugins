@@ -350,10 +350,12 @@ class WPcom_VIP_Plugins_UI {
 	 */
 	public function include_active_plugins() {
 		foreach ( $this->get_active_plugins_option() as $plugin ) {
+			$parsed_plugin = $this->parse_slug_and_version( $plugin );
+			
 			if ( has_blog_sticker( 'vip-plugins-ui-rc-plugins' ) ) {
-				wpcom_vip_load_plugin( $plugin, 'plugins', true );
+				wpcom_vip_load_plugin( $parsed_plugin['slug'], 'plugins', true );
 			} else {
-				$parsed_plugin = $this->parse_slug_and_version( $plugin );
+
 				if ( $parsed_plugin['version'] )
 					wpcom_vip_load_plugin( $parsed_plugin['slug'], 'plugins', $parsed_plugin['version'] );
 				else
