@@ -634,6 +634,17 @@ class WPcom_VIP_Plugins_UI {
 	 * @return array [ 'slug' => $slug, 'version' => $version, 'versioned_slug' => $versioned_slug ]
 	 */
 	public function parse_slug_and_version( string $plugin ): array {
+		// Special cases we need to skip
+		$blacklist = [ 'breadcrumb-navxt-39', 'livefyre-3' ];
+
+		if ( in_array( $plugin, $blacklist, true ) ) {
+			return [
+				'slug' => $plugin,
+				'version' => '',
+				'versioned_slug' => $plugin
+			];
+		}
+		
 		// We need to parse out slug and version, generally speaking version part is your typical software version,
 		// But there are some special snowflakes.
 		preg_match( '/(?P<slug>[-_a-zA-Z]+)(?P<version>[\.\d\-]+(beta|mod|WPCOM)?)?/i', $plugin, $matches );
