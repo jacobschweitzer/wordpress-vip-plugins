@@ -635,7 +635,7 @@ class WPcom_VIP_Plugins_UI {
 	 */
 	public function parse_slug_and_version( string $plugin ): array {
 		// Special cases we need to skip
-		$blacklist = [ 'breadcrumb-navxt-39', 'livefyre-3' ];
+		$blacklist = [ 'breadcrumb-navxt-39', 'livefyre3' ];
 
 		if ( in_array( $plugin, $blacklist, true ) ) {
 			return [
