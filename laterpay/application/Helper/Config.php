@@ -26,7 +26,7 @@ class LaterPay_Helper_Config {
                 'code'                    => 'EUR',
                 'dynamic_start'           => 13,
                 'dynamic_end'             => 18,
-                'default_price'           => 0.29,
+                'default_price'           => 0.39,
                 'limits' => array(
                     'default' => array(
                         'ppu_min'         => 0.05,
@@ -34,7 +34,8 @@ class LaterPay_Helper_Config {
                         'ppu_max'         => 5.00,
                         'sis_min'         => 1.49,
                         'sis_only_limit'  => 5.01,
-                        'sis_max'         => 149.99
+                        'sis_max'         => 1000.00,
+                        'sis_min_limit'   => 1.50,
                     )
                 )
             ),
@@ -66,7 +67,7 @@ class LaterPay_Helper_Config {
                 'code'                    => 'USD',
                 'dynamic_start'           => 13,
                 'dynamic_end'             => 18,
-                'default_price'           => 0.29,
+                'default_price'           => 0.39,
                 'limits' => array(
                     'default' => array(
                         'ppu_min'         => 0.05,
@@ -74,7 +75,8 @@ class LaterPay_Helper_Config {
                         'ppu_max'         => 5.00,
                         'sis_min'         => 1.99,
                         'sis_only_limit'  => 5.01,
-                        'sis_max'         => 149.99,
+                        'sis_max'         => 1000.00,
+                        'sis_min_limit'   => 2.00,
                     )
                 )
             ),
@@ -307,6 +309,22 @@ class LaterPay_Helper_Config {
     }
 
     /**
+     * Get regional settings by passed parameter
+     *
+     * @param string $region Region whose settings are needed.
+     *
+     * @return array
+     */
+    public static function get_regional_settings_by_param( $region ) {
+
+        if ( ! isset( self::$regional_settings[ $region ] ) ) {
+            $region = 'us';
+        }
+
+        return self::build_settings_list(self::$regional_settings[ $region ]);
+    }
+
+    /**
      * Erase plugin data on plugin disable.
      */
     public static function erase_plugin_data() {
@@ -378,6 +396,11 @@ class LaterPay_Helper_Config {
         delete_option( 'laterpay_hover_color' );
         delete_option( 'laterpay_require_login' );
         delete_option( 'laterpay_region' );
+        delete_option( 'lp_body_text' );
+        delete_option( 'lp_appearance_config' );
+        delete_option( 'lp_update_highlights' );
+        delete_option( 'laterpay_show_cache_msg' );
+        delete_option( 'lp_tabular_info' );
         delete_option( 'laterpay_plugin_version' );
 
         // Delete Post Price Display Behaviour Option.

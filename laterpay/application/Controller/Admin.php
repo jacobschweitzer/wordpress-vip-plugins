@@ -184,7 +184,7 @@ class LaterPay_Controller_Admin extends LaterPay_Controller_Base
         );
         $this->assign( 'laterpay', $view_args );
 
-	    $this->render( 'backend/partials/html5shiv' );
+        $this->render( 'backend/partials/html5shiv' );
     }
 
     /**
@@ -217,6 +217,11 @@ class LaterPay_Controller_Admin extends LaterPay_Controller_Base
             case 'account':
                 $account_controller = new LaterPay_Controller_Admin_Account( $this->config );
                 $account_controller->render_page();
+                break;
+            // render advanced tab
+            case 'advanced':
+                $advanced_controller = new LaterPay_Controller_Admin_Advanced( $this->config );
+                $advanced_controller->render_page();
                 break;
         }
     }
@@ -697,6 +702,13 @@ class LaterPay_Controller_Admin extends LaterPay_Controller_Base
             $menu = array_reverse( $menu );
         }
 
+        // Adding advanced tab to the end of menu, so that it isn't affected by plugin mode.
+        $menu['advanced'] = array(
+            'url'   => 'laterpay-advanced-tab',
+            'title' => esc_html__( 'Advanced', 'laterpay' ),
+            'cap'   => 'activate_plugins',
+        );
+
         $event->set_result( $menu );
     }
 
@@ -734,6 +746,38 @@ class LaterPay_Controller_Admin extends LaterPay_Controller_Base
         if ( 'pricing' === $page ) {
             $ga_data['live_merchant_id'] = get_option( 'laterpay_live_merchant_id' );
             $ga_data['sb_merchant_id']   = get_option( 'laterpay_sandbox_merchant_id' );
+        }
+
+        // Following vars are not for GA but for update notice.
+        $ga_data['update_highlights'] = get_option( 'lp_update_highlights', [] );
+
+        if ( ! empty( $ga_data['update_highlights']['version'] ) ) {
+            $version_update_number                   = $ga_data['update_highlights']['version'];
+            $ga_data['update_highlights']['version'] = sprintf( __( 'Version %s Highlights:', 'laterpay' ), $version_update_number );
+            $ga_data['update_highlights']['notice']  = sprintf( __( 'You can now fully customize the appearance of your payment overlay. Visit the Appearance tab, to check it out!', 'laterpay' ) );
+            $ga_data['update_highlights_nonce']      = wp_create_nonce( 'update_highlights_nonce' );
+        }
+
+        $data_for_localize['lp_instructional_info'] = [];
+        $data_for_localize['ajaxUrl']               = admin_url( 'admin-ajax.php' );
+        $data_for_localize['learn_more']            = __( 'Learn More', 'laterpay' );
+
+        $tab_information = [
+            'appearance' => sprintf( __( '%sOptional%s Use the appearance tab to configure your payment button colors and how your pricing options are displayed.', 'laterpay' ), '<b>', '</b>' ),
+            'pricing'    => sprintf( __( '%sREQUIRED%s Use this tab to configure your default prices. Prices can also be set for an individual post on the edit post page.', 'laterpay' ), '<b>', '</b>' ),
+            'advanced'   => sprintf( __( '%sOptional%s Here we highlight advanced features & settings like contributions, selling downloadable content, and promoting your subscriptions. Scroll through to learn more!', 'laterpay' ), '<b>', '</b>' ),
+        ];
+
+        $tab_information_status = get_option( 'lp_tabular_info' );
+
+        foreach ( $tab_information as $key => $value ) {
+            if ( 1 === absint( $tab_information_status[ $key ] ) ) {
+                $data_for_localize['lp_instructional_info'][ $key ] = $value;
+            }
+        }
+
+        if ( ! empty( $data_for_localize['lp_instructional_info'] ) ) {
+            $data_for_localize['read_tabular_nonce'] = wp_create_nonce( 'read_tabular_info_nonce' );
         }
 
         $final_data = array_merge( $ga_data,$data_for_localize );

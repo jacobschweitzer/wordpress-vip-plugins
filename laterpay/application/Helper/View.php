@@ -136,7 +136,6 @@ class LaterPay_Helper_View
         $is_in_live_mode            = get_option( 'laterpay_plugin_is_in_live_mode' );
         $sandbox_api_key            = get_option( 'laterpay_sandbox_api_key' );
         $live_api_key               = get_option( 'laterpay_live_api_key' );
-        $is_in_visible_test_mode    = get_option( 'laterpay_is_in_visible_test_mode' );
         if ( ! function_exists( 'wp_get_current_user' ) ) {
             include_once( ABSPATH . 'wp-includes/pluggable.php' );
         }
@@ -152,7 +151,7 @@ class LaterPay_Helper_View
         }
 
         // check, if plugin is not in live mode and is in visible test mode
-        if ( ! $is_in_live_mode && $is_in_visible_test_mode ) {
+        if ( ! $is_in_live_mode && current_user_can( 'manage_options' ) ) {
             return true;
         }
 
@@ -283,7 +282,7 @@ class LaterPay_Helper_View
 
         if ( $hover_color ) {
             $custom_css .= "
-                .lp_purchase-button:hover {
+                .lp_purchase-button:hover, .lp_purchase-overlay__submit:hover {
                     background-color: {$hover_color} !important;
                 }
                 .lp_time-pass__front-side-link:hover {
@@ -310,5 +309,25 @@ class LaterPay_Helper_View
      */
     public static function is_plugin_in_live_mode() {
         return (bool) get_option( 'laterpay_plugin_is_in_live_mode' );
+    }
+
+    /**
+     * Check if user is in preview mode.
+     *
+     * @param bool $preview_post_as_visitor Check admin user is viewing as visitor.
+     *
+     * @return int
+     */
+    public static function check_is_preview_mode( $preview_post_as_visitor ) {
+        // Use LIVE mode status to update preview behaviour.
+        $is_in_live_mode = get_option( 'laterpay_plugin_is_in_live_mode' );
+
+        if ( $is_in_live_mode && $preview_post_as_visitor ) {
+            $is_preview = 1;
+        } else {
+            $is_preview = 0;
+        }
+
+        return $is_preview;
     }
 }

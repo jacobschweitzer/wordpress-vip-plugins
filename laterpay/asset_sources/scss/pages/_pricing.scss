@@ -86,7 +86,6 @@ div.lp_js_categoryButtonContainer {
 
 	display: inline-block;
 	position: absolute;
-	z-index: 999;
 
 	&:hover {
 		&:after, &:before {
@@ -101,6 +100,14 @@ div.lp_js_categoryPanelWarning {
 	p {
 		color: #ff1744;
 	}
+}
+
+div.lp_js_subscriptionPanelWarning {
+    margin: 0 auto $fs;
+    width: 500px;
+    p {
+        color: #ff1744;
+    }
 }
 
 // category default prices ---------------------------------------------------------------------------------------------

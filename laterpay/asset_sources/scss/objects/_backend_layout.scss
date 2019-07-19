@@ -1,3 +1,11 @@
+body {
+    background: #FFFFFF;
+
+    #wpcontent {
+        padding-left: 0px;
+    }
+}
+
 // content area --------------------------------------------------------------------------------------------------------
 .lp_page {
     min-height: 100%;
@@ -7,19 +15,31 @@
     max-width: ($fs * 88);
     overflow-x: hidden;
     padding: $fs;
+    padding-top: 1px;
 }
 
+.lp_main_area {
+    width: 50%;
+    float: left;
+    background: #FFFFFF;
+}
+
+.lp_side_area {
+    background-color: #fafafa;
+    width: 40%;
+    position: absolute;
+    right: 0;
+    height: 100%;
+}
 
 // tabs ----------------------------------------------------------------------------------------------------------------
 .lp_navigation {
     background-color: $background--lightest;
-    border-bottom: 1px solid $border--darker;
-    box-shadow: 0 1px 0 $background--lightest;
-    left: -20px;
-    padding-right: 20px;
-    padding-top: $fs--15;
+    padding-top: $fs;
     position: relative;
     width: 100%;
+    box-shadow: 0 3px 1px rgba(0,0,0,.2);
+    z-index: 9;
 }
 
 .lp_navigation-tabs {
@@ -34,8 +54,21 @@
     display: inline-block;
     margin-left: $fs;
     position: relative;
-    top: 2px;
+    text-transform: uppercase;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
 
+    &:after{
+        right: -8px;
+        content: "\f140";
+        font: normal 20px/1 dashicons;
+        bottom: 10px;
+        position: absolute;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-decoration: none!important;
+        color: $laterpay-menu-background;
+        font-size: (2 * $fs);
+    }
     &:first-child {
         margin-left: 0;
     }
@@ -54,15 +87,19 @@
     }
 
     &.lp_is-current {
-        background-color: $background;
-        border-radius: 4px 4px 0 0;
-        border-top: 4px solid $laterpay-brand;
+        background-color: $laterpay-menu-background;
+        border: 4px solid $laterpay-menu-background;
+
+        &:after{
+            content: none;
+        }
 
         &:hover > .lp_navigation-tabs__link,
         > .lp_navigation-tabs__link {
-            color: $text;
-            cursor: default;
-            font-weight: bold;
+            color: $purchase-button-text;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
         }
     }
 }
@@ -88,12 +125,27 @@
     background: $background;
 }
 
+.lp_step_label {
+    text-transform: uppercase;
+    font-size: $fs;
+    font-weight: 800;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
 
+    .lp_step_span {
+        border-bottom: 2px solid #4aa69d;
+        padding-bottom: 5px;
+        transition: width 2s;
+    }
+}
+
+.lp_info_div {
+    padding: 20px 0;
+}
 // plugin mode indicator -----------------------------------------------------------------------------------------------
 .lp_plugin-mode-indicator {
     position: absolute;
-    right: $fs * 7; // leave sufficient space for contextual help link
-    top: $fs--025;
+    right: 6%; // leave sufficient space for contextual help link
+    top: 10px;
 
     // LaterPay logo (rendered in pseudo element from icon font)
     &:before {
@@ -171,6 +223,16 @@
     }
 }
 
+a.lp_info_link {
+    color: #00aaa2;
+    text-decoration: underline;
+}
+
+a.lp_info_link_black {
+    color: #000000;
+    text-decoration: underline;
+}
+
 
 // contextual help -----------------------------------------------------------------------------------------------------
 #screen-meta { // WordPress selector
@@ -187,5 +249,17 @@
 @media (max-width:1279px) {
     .lp_pagewrap {
         padding: 0;
+        padding-left: 10px;
+    }
+    .lp_plugin-mode-indicator {
+        right: 9%;
+    }
+}
+
+@media screen and (max-width: 782px) {
+    body{
+        #wpcontent {
+            padding-left: 0px !important;
+        }
     }
 }

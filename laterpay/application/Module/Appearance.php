@@ -73,7 +73,7 @@ class LaterPay_Module_Appearance extends LaterPay_Core_View implements LaterPay_
         if ( $user_has_unlimited_access && ! $preview_post_as_visitor ) {
             $event->stop_propagation();
         }
-        $event->add_argument( 'attributes', array( 'data-preview-post-as-visitor' => $preview_post_as_visitor ) );
+        $event->add_argument( 'attributes', array( 'data-preview-post-as-visitor' => LaterPay_Helper_View::check_is_preview_mode( $preview_post_as_visitor ) ) );
         $event->set_argument( 'preview_post_as_visitor', $preview_post_as_visitor );
     }
 
@@ -83,8 +83,7 @@ class LaterPay_Module_Appearance extends LaterPay_Core_View implements LaterPay_
      * @param LaterPay_Core_Event $event
      */
     public function on_visible_test_mode( LaterPay_Core_Event $event ) {
-        $is_in_visible_test_mode = get_option( 'laterpay_is_in_visible_test_mode' )
-                                   && ! $this->config->get( 'is_in_live_mode' );
+        $is_in_visible_test_mode = $this->config->get( 'is_in_live_mode' );
 
         $event->set_argument( 'is_in_visible_test_mode', $is_in_visible_test_mode );
     }

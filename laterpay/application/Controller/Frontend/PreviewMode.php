@@ -33,47 +33,6 @@ class LaterPay_Controller_Frontend_PreviewMode extends LaterPay_Controller_Base
     }
 
     /**
-     * Check requirements for logging and rendering the post statistic pane via Ajax callback.
-     *
-     * @param WP_Post $post
-     *
-     * @return bool
-     */
-    protected function check_requirements( $post = null ) {
-
-        if ( empty( $post ) ) {
-            // check, if we're on a singular page
-            if ( ! is_singular() ) {
-                return false;
-            }
-
-            // check, if we have a post
-            $post = get_post();
-            if ( $post === null ) {
-                return false;
-            }
-        }
-
-        // don't collect statistics data, if the current post is not published
-        if ( $post->post_status !== LaterPay_Helper_Pricing::STATUS_POST_PUBLISHED ) {
-            return false;
-        }
-
-        // don't collect statistics data, if the current post_type is not an allowed post_type
-        $allowed_post_types = $this->config->get( 'content.enabled_post_types' );
-        if ( ! in_array( $post->post_type, $allowed_post_types, true ) ) {
-            return false;
-        }
-
-        // don't collect statistics data, if the current post is not purchasable
-        if ( ! LaterPay_Helper_Pricing::is_purchasable( $post->ID ) ) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Callback to add the statistics placeholder to the footer.
      *
      * @wp-hook wp_footer
@@ -82,7 +41,9 @@ class LaterPay_Controller_Frontend_PreviewMode extends LaterPay_Controller_Base
      * @return void
      */
     public function modify_footer( LaterPay_Core_Event $event ) {
-        if ( ! $this->check_requirements() ) {
+
+        // Check if preview widget needs to be displayed.
+        if ( ! $this->check_preview_eligibility() ) {
             return;
         }
 
@@ -183,9 +144,11 @@ class LaterPay_Controller_Frontend_PreviewMode extends LaterPay_Controller_Base
         $post = get_post( $post_id );
         // assign variables
         $view_args = array(
-            'diplay_preview_pane'       => LaterPay_Helper_User::display_preview_pane(),
-            'hide_preview_mode_pane'    => LaterPay_Helper_User::preview_mode_pane_is_hidden(),
-            'preview_post_as_visitor'   => (bool) LaterPay_Helper_User::preview_post_as_visitor( $post ),
+            'diplay_preview_pane'     => LaterPay_Helper_User::display_preview_pane(),
+            'hide_preview_mode_pane'  => LaterPay_Helper_User::preview_mode_pane_is_hidden(),
+            'preview_post_as_visitor' => (bool) LaterPay_Helper_User::preview_post_as_visitor( $post ),
+            'admin_menu'              => LaterPay_Helper_View::get_admin_menu(),
+            'plugin_is_in_live_mode'  => $this->config->get( 'is_in_live_mode' ),
         );
         $this->assign( 'laterpay', $view_args );
 
@@ -241,5 +204,30 @@ class LaterPay_Controller_Frontend_PreviewMode extends LaterPay_Controller_Base
                 'message' => __( 'Updated.', 'laterpay' ),
             )
         );
+    }
+
+    /**
+     * Check if preview widget is needed or not.
+     *
+     * @return bool
+     */
+    private function check_preview_eligibility() {
+        // Check if it's a singular page.
+        if ( ! is_singular() ) {
+            return false;
+        }
+
+        // Check current post data.
+        $post = get_post();
+        if ( $post === null ) {
+            return false;
+        }
+
+        // Check if content is purchasable.
+        if ( ! LaterPay_Helper_Post::is_content_purchasable( $post->ID ) ) {
+            return false;
+        }
+
+        return true;
     }
 }

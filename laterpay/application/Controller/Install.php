@@ -380,7 +380,9 @@ class LaterPay_Controller_Install extends LaterPay_Controller_Base
         $overlay_default_options = LaterPay_Helper_Appearance::get_default_options();
 
         foreach ($overlay_default_options as $key => $value) {
-            update_option('laterpay_overlay_' . $key, $value);
+            if ( false === get_option( 'laterpay_overlay_' . $key ) ) {
+                update_option('laterpay_overlay_' . $key, $value);
+            }
         }
     }
 
@@ -443,7 +445,6 @@ class LaterPay_Controller_Install extends LaterPay_Controller_Base
         add_option( 'laterpay_gift_codes_usages',                       '' );
         add_option( 'laterpay_purchase_button_positioned_manually',     '' );
         add_option( 'laterpay_time_passes_positioned_manually',         '' );
-        add_option( 'laterpay_is_in_visible_test_mode',                 0 );
 
         // advanced settings
         add_option( 'laterpay_region',                                  'us' );
@@ -452,11 +453,10 @@ class LaterPay_Controller_Install extends LaterPay_Controller_Base
         add_option( 'laterpay_preview_excerpt_percentage_of_content',   '25' );
         add_option( 'laterpay_preview_excerpt_word_count_min',          '26' );
         add_option( 'laterpay_preview_excerpt_word_count_max',          '200' );
-        add_option( 'laterpay_enabled_post_types',                      get_post_types( array( 'public' => true ) ) );
+        add_option( 'laterpay_enabled_post_types', [ 'post' => 'post', 'attachment' => 'attachment' ] );
         add_option( 'laterpay_require_login',                           '' );
         add_option( 'laterpay_maximum_redemptions_per_gift_code',       1 );
         add_option( 'laterpay_api_fallback_behavior',                   0 );
-        add_option( 'laterpay_api_enabled_on_homepage',                 1 );
 
         // keep the plugin version up to date
         update_option( 'laterpay_plugin_version', $this->config->get( 'version' ) );
@@ -494,6 +494,9 @@ class LaterPay_Controller_Install extends LaterPay_Controller_Base
         $this->init_ga_options();
         $this->remove_laterpay_pro_merchant_option();
         $this->remove_custom_table_support();
+        $this->update_appearance_config();
+        $this->add_update_highlights();
+        $this->add_tabular_info_option();
 
     }
 
@@ -643,5 +646,66 @@ class LaterPay_Controller_Install extends LaterPay_Controller_Base
 
         }
 
+    }
+
+    /**
+     * Update appearance config based on current value to match new options.
+     */
+    private function update_appearance_config() {
+        $current_version = get_option( 'laterpay_plugin_version' );
+
+        if ( version_compare( $current_version, '2.5.2', '<' ) ) {
+            return;
+        }
+
+        if ( false === get_option( 'lp_appearance_config' ) && false === get_option( 'lp_body_text' ) ) {
+            LaterPay_Helper_Appearance::update_appearance_configs();
+        }
+
+    }
+
+    /**
+     * Add Update Highlights Notice.
+     */
+    public function add_update_highlights() {
+
+        $current_version = get_option( 'laterpay_plugin_version' );
+
+        $update_highlights = [];
+
+        if ( ! empty( $current_version ) && false === get_option( 'lp_update_highlights' ) ) {
+
+            if ( version_compare( $current_version, '2.5.4', '<' ) ) {
+                return;
+            }
+
+            $update_highlights = [
+                'version' => '2.6.0',
+                'notice'  => __( 'You can now fully customize the appearance of your payment overlay. Visit the Appearance tab to check it out!', 'laterpay' ),
+            ];
+
+            update_option( 'lp_update_highlights', $update_highlights );
+            return;
+        }
+
+        update_option( 'lp_update_highlights', $update_highlights );
+
+    }
+
+    /**
+     * Add option to manage tabular instructional notice.
+     */
+    public function add_tabular_info_option() {
+        // Add option to show instruction on given tabs.
+        if ( false === get_option( 'lp_tabular_info' ) ) {
+            // If `1` then show notice.
+            update_option( 'lp_tabular_info',
+                [
+                    'appearance' => 1,
+                    'pricing'    => 1,
+                    'advanced'   => 1,
+                ]
+            );
+        }
     }
 }

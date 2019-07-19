@@ -23,6 +23,11 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
                 array( 'laterpay_on_ajax_send_json', 300 ),
                 array( 'disable_plugin', 400 ),
             ),
+            'wp_ajax_laterpay_validate_cred_region' => array(
+                array( 'laterpay_on_admin_view', 200 ),
+                array( 'laterpay_on_ajax_send_json', 300 ),
+                array( 'ajax_validate_cred_region', 400 ),
+            ),
         );
     }
 
@@ -38,9 +43,6 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
 
         LaterPay_Controller_Admin::register_common_scripts( 'account' );
 
-        // Add thickbox to display modal.
-        add_thickbox();
-
         // load page-specific JS
         wp_register_script(
             'laterpay-backend-account',
@@ -50,8 +52,6 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
             true
         );
 
-        $nonce = wp_create_nonce( 'plugin_disable_nonce' ) ;
-
         wp_enqueue_script( 'laterpay-backend-account' );
 
         // pass localized strings and variables to script
@@ -59,19 +59,16 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
             'laterpay-backend-account',
             'lpVars',
             array(
+                'ajaxUrl'               => admin_url( 'admin-ajax.php' ),
                 'i18nApiKeyInvalid'     => __( 'The API key you entered is not a valid LaterPay API key!', 'laterpay' ),
                 'i18nMerchantIdInvalid' => __( 'The Merchant ID you entered is not a valid LaterPay Merchant ID!', 'laterpay' ),
                 'i18nPreventUnload'     => __( 'LaterPay does not work properly with invalid API credentials.', 'laterpay' ),
                 'gaData'                => array(
                     'sandbox_merchant_id' => ( ! empty( $merchant_key ) ) ? esc_js( $merchant_key ) : '',
-                    'site_url'            => ( ! empty( $site_url ) ) ? esc_url( $site_url ): '',
+                    'site_url'            => ( ! empty( $site_url ) ) ? esc_url( $site_url ) : '',
                 ),
-                'plugin_disable_nonce' => $nonce,
-                'modal'                => array(
-                    'id'    => 'lp_plugin_disable_modal_id',
-                    'title' => ( laterpay_check_is_vip() ) ? esc_html__( 'Delete Plugin Data', 'laterpay' ) : esc_html__( 'Deactivate Plugin & Delete Data', 'laterpay' ),
-                ),
-                'pluginsUrl' => admin_url( 'plugins.php' ),
+                'reset_cache_nonce'     => wp_create_nonce( 'reset_cache_nonce' ),
+                'validate_cred_nonce'   => wp_create_nonce( 'validate_cred_nonce' ),
             )
         );
     }
@@ -91,10 +88,13 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
             'credentials_url_eu'                => 'https://web.laterpay.net/dialog/entry/?redirect_to=/merchant/add#/signup',
             'credentials_url_us'                => 'https://web.uselaterpay.com/dialog/entry/?redirect_to=/merchant/add#/signup',
             'plugin_is_in_live_mode'            => $this->config->get( 'is_in_live_mode' ),
-            'plugin_is_in_visible_test_mode'    => get_option( 'laterpay_is_in_visible_test_mode' ),
             'account_obj'                       => $this,
             'admin_menu'                        => LaterPay_Helper_View::get_admin_menu(),
         );
+
+        if ( false === get_option( 'laterpay_show_cache_msg' ) ) {
+            update_option( 'laterpay_show_cache_msg', 0 );
+        }
 
         $this->assign( 'laterpay', $view_args );
 
@@ -150,10 +150,6 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
 
             case 'laterpay_plugin_mode':
                 self::update_plugin_mode( $event );
-                break;
-
-            case 'laterpay_test_mode':
-                self::update_plugin_visibility_in_test_mode( $event );
                 break;
 
             case 'laterpay_region_change':
@@ -303,20 +299,12 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
 
         if ( $result ) {
             if ( get_option( 'laterpay_plugin_is_in_live_mode' ) ) {
+                update_option( 'laterpay_show_cache_msg', 1 );
                 $event->set_result(
                     array(
                         'success'   => true,
                         'mode'      => 'live',
                         'message'   => __( 'The LaterPay plugin is in LIVE mode now. All payments are actually booked and credited to your account.', 'laterpay' ),
-                    )
-                );
-                return;
-            } elseif ( get_option( 'plugin_is_in_visible_test_mode' ) ) {
-                $event->set_result(
-                    array(
-                        'success'   => true,
-                        'mode'      => 'test',
-                        'message'   => __( 'The LaterPay plugin is in visible TEST mode now. Payments are only simulated and not actually booked.', 'laterpay' ),
                     )
                 );
                 return;
@@ -392,60 +380,6 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
     }
 
     /**
-     * Toggle LaterPay plugin test mode between INVISIBLE and VISIBLE.
-     *
-     * @throws LaterPay_Core_Exception_FormValidation
-     *
-     * @return void
-     */
-    public static function update_plugin_visibility_in_test_mode( LaterPay_Core_Event $event ) {
-        $plugin_test_mode_form = new LaterPay_Form_TestMode();
-
-        if ( ! $plugin_test_mode_form->is_valid( $_POST ) ) { // phpcs:ignore
-            $event->set_result(
-                array(
-                    'success'   => false,
-                    'mode'      => 'test',
-                    'message'   => __( 'An error occurred. Incorrect data provided.', 'laterpay' ),
-                )
-            );
-            throw new LaterPay_Core_Exception_FormValidation( get_class( $plugin_test_mode_form ), $plugin_test_mode_form->get_errors() );
-        }
-
-        $is_in_visible_test_mode = $plugin_test_mode_form->get_field_value( 'plugin_is_in_visible_test_mode' );
-        $has_invalid_credentials = $plugin_test_mode_form->get_field_value( 'invalid_credentials' );
-
-        if ( $has_invalid_credentials ) {
-            update_option( 'laterpay_is_in_visible_test_mode', 0 );
-
-            $event->set_result(
-                array(
-                    'success'   => false,
-                    'mode'      => 'test',
-                    'message'   => __( 'The LaterPay plugin needs valid API credentials to work.', 'laterpay' ),
-                )
-            );
-            return;
-        }
-
-        update_option( 'laterpay_is_in_visible_test_mode', $is_in_visible_test_mode );
-
-        if ( $is_in_visible_test_mode ) {
-            $message = sprintf( esc_html__( 'The plugin is in %svisible%s test mode now.', 'laterpay' ), "<strong>", "</strong>" );
-        } else {
-            $message = sprintf( esc_html__( 'The plugin is in %sinvisible%s test mode now.', 'laterpay' ), "<strong>", "</strong>" );
-        }
-
-        $event->set_result(
-            array(
-                'success'   => true,
-                'mode'      => 'test',
-                'message'   => $message,
-            )
-        );
-    }
-
-    /**
      * Erase data and disable plugin.
      *
      * @param LaterPay_Core_Event $event
@@ -453,6 +387,11 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
      * @return void
      */
     public function disable_plugin( LaterPay_Core_Event $event ) {
+
+        if ( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
         check_ajax_referer('plugin_disable_nonce', 'security' );
 
         LaterPay_Helper_Config::erase_plugin_data();
@@ -478,5 +417,104 @@ class LaterPay_Controller_Admin_Account extends LaterPay_Controller_Admin_Base {
                 )
             );
         }
+    }
+
+    /**
+     * Validate API Key, Merchant ID and Region combination
+     *
+     * @wp-hook wp_ajax_laterpay_validate_cred_region
+     *
+     * @param LaterPay_Core_Event $event
+     *
+     * @return void
+     */
+    public function ajax_validate_cred_region( LaterPay_Core_Event $event ) {
+
+        if ( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        check_ajax_referer( 'validate_cred_nonce', 'security' );
+
+        $current_region = get_option( 'laterpay_region', 'us' );
+        $client         = $this->get_client_instance_for_config();
+
+        // Check if current config is valid or not.
+        $first_response = json_decode( $client->check_health( true ), true );
+
+        // Check credential combination in other region.
+        if ( false === $first_response['is_valid'] ) {
+            if ( 'us' === $current_region ) {
+                $regional_settings = LaterPay_Helper_Config::get_regional_settings_by_param( 'eu' );
+                $region_text       = 'EURO (€)';
+            } else {
+                $regional_settings = LaterPay_Helper_Config::get_regional_settings_by_param( 'us' );
+                $region_text       = 'USD ($)';
+            }
+
+            // Temporarily change API endpoint to check with other region.
+            $client = $this->get_client_instance_for_config( $regional_settings['api.live_backend_api_url'], $regional_settings['api.live_dialog_api_url'] );
+
+            // Check if the config is valid or not with other region.
+            $signature_response = json_decode( $client->check_health( true ), true );
+
+            $is_valid = $signature_response['is_valid'];
+
+            update_option( 'laterpay_plugin_is_in_live_mode', '0' );
+            if ( $is_valid ) {
+                $event->set_result(
+                    array(
+                        'success' => false,
+                        'mode'    => 'test',
+                        'message' => sprintf( __( 'Your LaterPay account is restricted to sell content in %s. Please update your currency or contact sales@laterpay.net.', 'laterpay' ), $region_text ),
+                    )
+                );
+            } else {
+                $event->set_result(
+                    array(
+                        'success' => false,
+                        'mode'    => 'test',
+                        'message' => __( 'The LaterPay plugin needs valid API credentials to work.', 'laterpay' ),
+                    )
+                );
+            }
+
+            return;
+        }
+
+        $event->set_result(
+            array(
+                'success' => true,
+            )
+        );
+
+        return;
+    }
+
+    /**
+     * Get a new client instance based on region.
+     *
+     * @param string $api_root API Endpoint.
+     * @param string $web_root Web Dialog URL.
+     *
+     * @return LaterPay_Client
+     */
+    private function get_client_instance_for_config( $api_root = '', $web_root = '' ) {
+        // Get current client options.
+        $client_options = LaterPay_Helper_Config::get_php_client_options();
+
+        // If region endpoints are passed the use it.
+        $api_root = empty( $api_root ) ? $client_options['api_root'] : $api_root;
+        $web_root = empty( $web_root ) ? $client_options['web_root'] : $web_root;
+
+        $client = new LaterPay_Client(
+            $client_options['cp_key'],
+            $client_options['api_key'],
+            $api_root,
+            $web_root,
+            $client_options['token_name']
+        );
+
+        return $client;
     }
 }

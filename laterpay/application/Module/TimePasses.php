@@ -25,6 +25,7 @@ class LaterPay_Module_TimePasses extends LaterPay_Core_View implements LaterPay_
                 array( 'modify_post_content', 5 ),
             ),
             'laterpay_time_passes' => array(
+                array( 'laterpay_on_plugin_is_working', 200 ),
                 array( 'on_timepass_render', 20 ),
                 array( 'the_time_passes_widget', 10 ),
             ),
@@ -177,6 +178,7 @@ class LaterPay_Module_TimePasses extends LaterPay_Core_View implements LaterPay_
             'has_vouchers'                   => $has_vouchers,
             'time_pass_introductory_text'    => $introductory_text,
             'time_pass_call_to_action_text'  => $call_to_action_text,
+            'is_overlay_enabled'             => LaterPay_Helper_Appearance::get_current_config( 'lp_show_purchase_overlay' ), // This is for adding some margin based on layout.
         );
 
         $this->assign( 'laterpay_widget', $view_args );
@@ -188,6 +190,12 @@ class LaterPay_Module_TimePasses extends LaterPay_Core_View implements LaterPay_
 
         // Check if content is purchasable.
         $is_purchasable = LaterPay_Helper_Pricing::is_purchasable( $post_id );
+
+        // Only add identity link for 'Teaser + Purchase Link' layout.
+        if ( $is_purchasable && (bool) get_option( 'laterpay_purchase_button_positioned_manually' ) && 0 === absint( LaterPay_Helper_Appearance::get_current_config( 'lp_show_purchase_overlay' ) ) ) {
+            $this->assign( 'laterpay', LaterPay_Helper_Post::get_identity_purchase_url( $post->ID ) );
+            $html .= LaterPay_Helper_View::remove_extra_spaces( $this->get_text_view( 'frontend/partials/widget/purchase-identity-url' ) );
+        }
 
         // If content is purchasable and time pass and subscription position is custom echo the code.
         if ( $is_purchasable && $is_tp_sub_list_position_custom && ! wp_doing_ajax() && 'laterpay_time_passes' === current_action() ) {
@@ -235,12 +243,6 @@ class LaterPay_Module_TimePasses extends LaterPay_Core_View implements LaterPay_
             return;
         }
 
-        // disable in purchase mode
-        if ( get_option( 'laterpay_teaser_mode' ) === '2' ) {
-            $event->stop_propagation();
-            return;
-        }
-
         $is_homepage                     = is_front_page() && is_home();
         $time_passes_positioned_manually = get_option( 'laterpay_time_passes_positioned_manually' );
 
@@ -257,6 +259,21 @@ class LaterPay_Module_TimePasses extends LaterPay_Core_View implements LaterPay_
 
         // don't display widget on a search or multiposts page, if it is positioned automatically
         if ( ! is_singular() && ! $time_passes_positioned_manually ) {
+            $event->stop_propagation();
+            return;
+        }
+
+        $appearance_config = LaterPay_Helper_Appearance::get_current_config();
+        // don't display widget on a search or multiposts page, if it is positioned automatically
+        if ( 1 !== $appearance_config['lp_show_tp_sub_below_modal'] ) {
+            $event->stop_propagation();
+            return;
+        }
+
+        // Don't show time pass in admin preview.
+        $preview_post_as_visitor   = LaterPay_Helper_User::preview_post_as_visitor( $post );
+        $user_has_unlimited_access = LaterPay_Helper_User::can( 'laterpay_has_full_access_to_content', $post );
+        if ( $user_has_unlimited_access && ! $preview_post_as_visitor ) {
             $event->stop_propagation();
             return;
         }
@@ -284,7 +301,7 @@ class LaterPay_Module_TimePasses extends LaterPay_Core_View implements LaterPay_
             $laterpay_pass['url'] = LaterPay_Helper_TimePass::get_laterpay_purchase_link( $laterpay_pass['pass_id'] );
         }
 
-        $laterpay_pass['preview_post_as_visitor'] = LaterPay_Helper_User::preview_post_as_visitor( get_post() );
+        $laterpay_pass['preview_post_as_visitor'] = LaterPay_Helper_View::check_is_preview_mode( LaterPay_Helper_User::preview_post_as_visitor( get_post() ) );
 
         $args = array(
             'standard_currency' => $this->config->get( 'currency.code' ),

@@ -111,6 +111,9 @@ class LaterPay_Controller_Admin_Pricing extends LaterPay_Controller_Admin_Base
             'payNowToolTip'             => esc_html__( 'Pay Now requires users pay for purchased content immediately; available for posts with pricing above $1.99 or 1.49€', 'laterpay' ),
             'subVoucherMinimum'         => esc_html__( 'Subscriptions, like other Pay Now content, must have pricing above $1.99 or 1.49€', 'laterpay' ),
             'subVoucherMaximumPrice'    => esc_html__( 'The voucher price must be less than or equal to the subscription price.', 'laterpay' ),
+            'tpVoucherMaximumPrice'     => esc_html__( 'The voucher price must be less than or equal to the time pass price.', 'laterpay' ),
+            'codeTooShort'              => esc_html__( 'Please enter a six-digit voucher code.', 'laterpay' ),
+            'voucherExists'             => esc_html__( 'This voucher code is already in use, please choose a different name.', 'laterpay' ),
         );
 
         // pass localized strings and variables to script
@@ -184,7 +187,7 @@ class LaterPay_Controller_Admin_Pricing extends LaterPay_Controller_Admin_Base
             $category->id             = implode( ',', $cat_ids );
             $category->category_name  = implode( ',', $cat_titles );
             $category->category_id    = implode( ',', $category_ids );
-            $category->category_price = ( ! empty( $category_group[0]->category_price ) ) ? $category_group[0]->category_price : '' ;
+            $category->category_price = ( ! empty( $category_group[0]->category_price ) ) ? $category_group[0]->category_price : floatval( 0.00 ) ;
             $category->revenue_model  = ( ! empty( $category_group[0]->revenue_model ) ) ? $category_group[0]->revenue_model : '';
             $category->identifier     = ( ! empty( $category_group[0]->identifier ) ) ? $category_group[0]->identifier : '';
 
@@ -837,6 +840,7 @@ class LaterPay_Controller_Admin_Pricing extends LaterPay_Controller_Admin_Base
         $event->set_result(
             array(
                 'success'  => true,
+                'region'   => get_option( 'laterpay_region', 'us' ),
                 'data'     => $data,
                 'vouchers' => $vouchers,
                 'html'     => $this->render_subscription( $hmtl_data ),
@@ -864,8 +868,9 @@ class LaterPay_Controller_Admin_Pricing extends LaterPay_Controller_Admin_Base
 
             $event->set_result(
                 array(
-                    'success'             => true,
-                    'message'             => esc_html__( 'Subscription deleted.', 'laterpay' ),
+                    'success' => true,
+                    'message' => esc_html__( 'Subscription deleted.', 'laterpay' ),
+                    'region'  => get_option( 'laterpay_region', 'us' ),
                 )
             );
         } else {

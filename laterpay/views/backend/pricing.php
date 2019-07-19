@@ -206,7 +206,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                                 esc_html__( '%sTIP:%s "Pay Later" is LaterPay\'s patented revenue model which allows your customers to purchase content with a single click, dramatically reducing their barriers to entry. Once they have purchased $5 or 5€ worth of content, they will be asked to settle their invoice. %sClick here to learn more.%s', 'laterpay' ),
                                                 "<b>",
                                                 "</b>",
-                                                "<a href='https://support.laterpay.net/hc/en-us/articles/201251457-What-is-LaterPay-' target='_blank'>",
+                                                "<a href='https://www.laterpay.net/academy/getting-started-with-laterpay-the-difference-between-pay-now-pay-later' target='_blank'>",
                                                 "</a>"
                                             );
                                             ?>
@@ -356,7 +356,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 esc_html__( 'Not familiar with WordPress categories? %s
                                 %sClick here to learn more.%s', 'laterpay' ),
                                 '<br>',
-                                '<a href="https://codex.wordpress.org/Posts_Categories_Screen" target="_blank">',
+                                '<a href="https://wordpress.org/support/article/posts-categories-screen/" target="_blank">',
                                 '</a>'
                             );
                             ?>
@@ -678,7 +678,19 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <?php esc_html_e( 'Create', 'laterpay' ); ?>
                     </a>
                 </h2>
-
+                <?php
+                if ( 'us' === get_option( 'laterpay_region', 'us' ) && count( $laterpay['subscriptions_list'] ) ) {
+                    $subscription_prices = array_map( 'floatval', array_column( $laterpay['subscriptions_list'], 'price' ) );
+                    if ( min( $subscription_prices ) < 1.99 ) {
+                        ?>
+                        <div class="lp_js_subscriptionPanelWarning" style="">
+                            <p data-icon="n">
+                                <?php esc_html_e( 'Important: The minimum value for "Pay Now" prices in the US is $1.99. Please be sure to update your subscriptions so that your users to not receive an error when they try to purchase.', 'laterpay' ); ?>
+                        </div>
+                        <?php
+                    }
+                }
+                ?>
                 <?php foreach ( $laterpay['subscriptions_list'] as $subscription ) : ?>
                     <div class="lp_js_subscriptionWrapper lp_subscriptions__item lp_clearfix" data-sub-id="<?php echo esc_attr( $subscription['id'] ); ?>">
                         <div class="lp_subscription__id-wrapper">
@@ -829,9 +841,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 <span class="lp_js_voucher_msg" data-icon="n"><?php printf( '%1$s<br/>%2$s', esc_html__( 'The voucher price must be less than or equal to the ', 'laterpay'), esc_html__( 'subscription price.', 'laterpay' )  ); ?></span>
 
                                 <div class="lp_js_voucherPlaceholder"></div>
-                                <a href="#" class="lp_js_generateVoucherCode lp_edit-link lp_add-link" data-icon="c">
+                                <a href="#" class="lp_js_generateVoucherCode lp_edit-link lp_add-link lp_sub_voucher_button" data-icon="c">
                                     <?php esc_html_e( 'Generate voucher code', 'laterpay' ); ?>
                                 </a>
+                                <span data-icon="n" class="lp_sub_voucher_disclaimer"><?php esc_html_e( 'This will reduce the price for the entirety of the subscription.', 'laterpay' ); ?></span>
                             </div>
 
                         </form>

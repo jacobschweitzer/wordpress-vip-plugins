@@ -278,6 +278,10 @@
     padding: $fs--05;
 }
 
+input.lp_voucher__code {
+    width: 95px;
+}
+
 /* price and number of times redeemed */
 .lp_voucher__code-infos {
     display: inline-block;
@@ -580,4 +584,14 @@
     margin: 0 !important;
     text-decoration: none !important;
     visibility: visible !important; /* 1 */
+}
+
+a.lp_sub_voucher_button {
+    width: 50%;
+    float: left;
+}
+span.lp_sub_voucher_disclaimer{
+    color: #ffb74d;
+    font-style: italic;
+    font-size: 12px;
 }

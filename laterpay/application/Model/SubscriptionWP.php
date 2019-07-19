@@ -74,7 +74,7 @@ class LaterPay_Model_SubscriptionWP {
         $query_args = array(
             // Meta query is required for post id.
             'meta_key'       => '_lp_id', // phpcs:ignore
-            'meta_value'     => $id, // phpcs:ignore
+            'meta_value'     => absint( $id ), // phpcs:ignore
             'meta_compare'   => '=',
             'posts_per_page' => 1,
             'post_type'      => 'lp_subscription',
@@ -82,9 +82,8 @@ class LaterPay_Model_SubscriptionWP {
             'fields'         => 'ids',
         );
 
-        $query = new WP_Query( $query_args );
-
-        $current_posts = $query->posts;
+        // Get data from data store.
+        $current_posts = self::get_subscription_from_data_store( $query_args );
 
         $id = ( isset( $current_posts[0] ) ) ? $current_posts[0] : '';
 
@@ -106,9 +105,8 @@ class LaterPay_Model_SubscriptionWP {
                 $query_args['post_status'] = 'publish';
             }
 
-            $get_subscription_query = new WP_Query( $query_args );
-
-            $posts = $get_subscription_query->get_posts();
+            // Get data from data store.
+            $posts = self::get_subscription_from_data_store( $query_args );
 
             if ( isset( $posts[0] ) ) {
                 $subscription = $this->transform_post_to_subscription( $posts[0] );
@@ -555,5 +553,29 @@ class LaterPay_Model_SubscriptionWP {
         }
 
         return $post_meta_new;
+    }
+
+    /**
+     * Get subscription data from internal cache.
+     *
+     * @param array $query_args Query args to be passed to WP_Query.
+     *
+     * @return array
+     */
+    private function get_subscription_from_data_store( $query_args ) {
+
+        // Create a hash from the query args.
+        $args_hash = md5( wp_json_encode( $query_args ) );
+
+        // Check if data exists for requested query args, if not, add it to internal cache.
+        if ( ! isset( self::$subscription_data_store[ $args_hash ] ) ) {
+
+            $query = new WP_Query( $query_args );
+
+            // Get posts for requested args.
+            self::$subscription_data_store[ $args_hash ] = $query->posts;
+        }
+
+        return self::$subscription_data_store[ $args_hash ];
     }
 }

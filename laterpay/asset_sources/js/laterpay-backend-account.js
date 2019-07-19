@@ -1,4 +1,4 @@
-/* global lpGlobal, tb_show*/
+/* global lpGlobal */
 (function($) {$(function() {
 
     // encapsulate all LaterPay Javascript in function laterPayBackendAccount
@@ -17,7 +17,6 @@
                 pluginModeIndicator             : $('#lp_js_pluginModeIndicator'),
                 pluginModeToggle                : $('#lp_js_togglePluginMode'),
                 pluginVisibilitySetting         : $('#lp_js_pluginVisibilitySetting'),
-                pluginVisibilityToggle          : $('#lp_js_toggleVisibilityInTestMode'),
                 hasInvalidSandboxCredentials    : $('#lp_js_hasInvalidSandboxCredentials'),
                 isLive                          : 'lp_is-live',
                 navigation                      : $('.lp_navigation'),
@@ -29,9 +28,9 @@
                 apiCredentials                  : $('#lp_js_apiCredentialsSection'),
                 requestSent                     : false,
 
-                pluginDelete                    : $('.lp_js_disablePlugin'),
-                pluginDeleteConfirm             : $('.lp_js_disablePluginConfirm'),
-                modalClose                      : $('button.lp_js_ga_cancel')
+                hide_cache_warning              : $('#hide_cache_warning'),
+                lp_cache_warning                : $('#lp_cache_warning'),
+                lp_account_login                : $('#lp_account_login')
             },
 
             regionVal = $o.region.val(),
@@ -67,13 +66,12 @@
                     togglePluginMode();
                 });
 
-                // switch plugin visibility in TEST mode
-                $o.pluginVisibilityToggle
-                .change(function() {
-                    toggleVisibilityInTestMode();
+                $o.showMerchantContractsButton.bind('click', function() {
+                    $(this).attr('href', $(this).data('href-'+$o.region.val()));
+                    return true;
                 });
 
-                $o.showMerchantContractsButton.bind('click', function() {
+                $o.lp_account_login.bind('click', function() {
                     $(this).attr('href', $(this).data('href-'+$o.region.val()));
                     return true;
                 });
@@ -83,52 +81,20 @@
                     preventLeavingWithoutValidCredentials();
                 };
 
-                // Display modal for plugin disable.
-                $o.pluginDelete.on('click', function() {
-                    if ( typeof tb_show === 'function' ) {
-                        tb_show( lpVars.modal.title,'#TB_inline?inlineId=' + lpVars.modal.id + '&height=185&width=375');
-                        $('div#TB_ajaxContent').css('padding','30px');
-
-                    }
+                $o.hide_cache_warning.on( 'click', function () {
+                    $.post(
+                        lpVars.ajaxUrl, {
+                            action   : 'laterpay_reset_notice_data',
+                            security : lpVars.reset_cache_nonce,
+                        },
+                        function(data) {
+                            if (data.success) {
+                                $o.lp_cache_warning.hide();
+                            }
+                        },
+                        'json'
+                    );
                 } );
-
-                // Close the modal and disable plugin.
-                $o.pluginDeleteConfirm.click(function(){
-                    $('#TB_closeWindowButton').click();
-                    disablePluginEraseData();
-                });
-
-                // Close the plugin disable modal.
-                $o.modalClose.click(function(){
-                    $('#TB_closeWindowButton').click();
-                });
-            },
-
-            disablePluginEraseData = function() {
-                var data = {
-                    action: 'laterpay_disable_plugin',
-                    security: lpVars.plugin_disable_nonce,
-                };
-
-                // Disable plugin and redirect to plugins page.
-                $.post( ajaxurl, data, function ( response ) {
-
-                    if ( $.type( response ) === 'string' ) {
-                        response = JSON.parse( response );
-                    }
-
-                    $o.navigation.showMessage(response);
-
-                        if ( false === response.is_vip ) {
-                            setTimeout(function() {
-                                window.location.replace(lpVars.pluginsUrl);
-                            }, 2000);
-                        } else  {
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 2000);
-                        }
-                });
             },
 
             autofocusEmptyInput = function() {
@@ -163,17 +129,13 @@
                     $o.hasInvalidSandboxCredentials.val(0);
                 }
 
-                // save visibility in test mode
-                makeAjaxRequest('laterpay_test_mode');
             },
 
             togglePluginModeIndicators = function(mode) {
                 if (mode === 'live') {
                     $('#lp_js_pluginModeIndicator').velocity('fadeOut', { duration: 250 });
-                    $('#lp_js_liveCredentials').addClass($o.isLive);
                 } else {
                     $('#lp_js_pluginModeIndicator').velocity('fadeIn', { duration: 250 });
-                    $('#lp_js_liveCredentials').removeClass($o.isLive);
                 }
             },
 
@@ -224,7 +186,7 @@
                             $o.testMerchantId.val( data.creds.cp_key );
                             $o.testApiKey.val( data.creds.api_key );
 
-                            if ( regionVal !== 'us' ) {
+                            if ( regionVal !== 'eu' ) {
                                 $o.regionNoticeBlock.removeClass('hidden');
                             } else {
                                 $o.regionNoticeBlock.addClass('hidden');
@@ -233,6 +195,12 @@
                     },
                     'json'
                 );
+
+                setTimeout(function() {
+                    if ( $o.pluginModeToggle.prop('checked') ) {
+                        validateCredByRegion();
+                    }
+                }, 2000);
             },
 
             makeAjaxRequest = function(form_id) {
@@ -257,11 +225,25 @@
                             var sbMerchantId   = $('#lp_js_sandboxMerchantId').val();
                             var liveMerchantId = $('#lp_js_liveMerchantId').val();
 
+                            if ( $o.pluginModeToggle.prop('checked') ) {
+                                $o.lp_cache_warning.show();
+                            }
+
                             var commonLabel = sbMerchantId + ' | ' + liveMerchantId + ' | ' +
                                 lpVars.gaData.site_url + ' | ';
                             var eveCategory = 'LP WP Account';
                             var eveAction = 'Account Status Change';
                             lpGlobal.sendLPGAEvent( eveAction, eveCategory, commonLabel + pluginStatus );
+                        }
+
+                        if ( 'laterpay_plugin_mode' === form_id ||
+                            'laterpay_live_merchant_id' === form_id ||
+                            'laterpay_live_api_key' === form_id ) {
+                            setTimeout(function() {
+                                if ( $o.pluginModeToggle.prop('checked') ) {
+                                    validateCredByRegion();
+                                }
+                            }, 2000);
                         }
                     });
                 }
@@ -343,6 +325,22 @@
                 if (hasNoValidCredentials()) {
                     return lpVars.i18nPreventUnload;
                 }
+            },
+
+            validateCredByRegion = function() {
+                $.post(
+                    lpVars.ajaxUrl, {
+                        action   : 'laterpay_validate_cred_region',
+                        security : lpVars.validate_cred_nonce,
+                    },
+                    function(data) {
+                        if ( data.hasOwnProperty( 'mode' ) ) {
+                            $o.pluginModeToggle.prop('checked', false);
+                            $o.navigation.showMessage(data);
+                        }
+                    },
+                    'json'
+                );
             },
 
             initializePage = function() {

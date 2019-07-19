@@ -11,15 +11,12 @@
       var laterpay_ua_id           = jQuery('input[name="laterpay_tracking_data[laterpay_ga_ua_id]"]');
 
       // Store value of each setting to be sent to GA.
-      var lp_main_color  = jQuery('input[name="laterpay_main_color"]').val();
-      var lp_hover_color = jQuery('input[name="laterpay_hover_color"]').val();
       var lp_teaser_content_word_count = jQuery('input[name="laterpay_teaser_content_word_count"]').val();
       var lp_percentage_of_content = jQuery('input[name="laterpay_preview_excerpt_percentage_of_content"]').val();
       var lp_preview_excerpt_word_count_min = jQuery('input[name="laterpay_preview_excerpt_word_count_min"]').val();
       var lp_excerpt_word_count_max = jQuery('input[name="laterpay_preview_excerpt_word_count_max"]').val();
       var lp_caching_enabled = jQuery('input[name="laterpay_caching_compatibility"]').prop('checked') ? 1 : 0;
       var lp_require_login = jQuery('input[name="laterpay_require_login"]').prop('checked') ? 1 :  0;
-      var lp_api_enabled_homepage = jQuery('input[name="laterpay_api_enabled_on_homepage"]').prop('checked') ? 1 : 0;
       var lp_ga_enabled  = laterpay_tracking_status.prop('checked') ? 1 : 0;
       var user_ga_enabled = user_tracking_status.prop('checked') ? 1 : 0;
       var lp_fallback_behaviour = jQuery('#lp_js_laterpayApiFallbackSelect :selected').text();
@@ -32,6 +29,23 @@
       var messageSpan = jQuery('<span/>', {
         id    : 'lp_ga_msg_span',
         class : 'lp_ga_span',
+      });
+
+      var infoSpan  = jQuery('span.lp_option_icon');
+      var infoClose = jQuery( 'button.lp_js_info_close' );
+
+      // Display Modal for Settings Page.
+      infoSpan.on('click', function( ) {
+          var id    = $(this).attr('id');
+          var title = $(this).attr('title');
+
+          if ( typeof tb_show === 'function' ) {
+              tb_show( title, '#TB_inline?inlineId=lp_' + id + '&height=245&width=375');
+          }
+      });
+
+      infoClose.click(function(){
+        jQuery('#TB_closeWindowButton').click();
       });
 
       // Validation For Personal Google Analytics Setting.
@@ -125,8 +139,6 @@
         var eveAction = 'Modify LaterPay Settings';
 
         // Send GA Events for Settings.
-        lpGlobal.sendLPGAEvent( 'Main color', eveCategory, commonLabel + lp_main_color );
-        lpGlobal.sendLPGAEvent( 'Hover color', eveCategory, commonLabel + lp_hover_color );
         lpGlobal.sendLPGAEvent( eveAction, eveCategory, commonLabel + 'Merchant GA Enabled', user_ga_enabled );
         lpGlobal.sendLPGAEvent( eveAction, eveCategory, commonLabel + 'LaterPay GA Enabled', lp_ga_enabled );
         lpGlobal.sendLPGAEvent( eveAction, eveCategory, commonLabel + 'Unlimited Access', getEnabledRoles() );
@@ -141,8 +153,7 @@
             lp_preview_excerpt_word_count_min );
         lpGlobal.sendLPGAEvent( eveAction, eveCategory, commonLabel + 'Maximum Number of Words',
             lp_excerpt_word_count_max );
-        lpGlobal.sendLPGAEvent( eveAction, eveCategory, commonLabel + 'LaterPay API | ' + lp_fallback_behaviour,
-            lp_api_enabled_homepage );
+        lpGlobal.sendLPGAEvent( eveAction, eveCategory, commonLabel + 'LaterPay API | ' + lp_fallback_behaviour );
 
       });
 

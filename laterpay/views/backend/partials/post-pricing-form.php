@@ -46,8 +46,7 @@ if ( ! empty( $laterpay['category_prices'] ) ) {
     $global_disabled_class = ' lp_is-disabled lp_tooltip';
 }
 
-$is_in_live_mode        = (bool) get_option( 'laterpay_plugin_is_in_live_mode' );
-$is_visible_to_visitors = (bool) get_option( 'laterpay_is_in_visible_test_mode' );
+$is_in_live_mode = (bool) get_option( 'laterpay_plugin_is_in_live_mode' );
 ?>
 <div class="lp_clearfix lp_postMetaBox">
     <?php if ( ! $is_in_live_mode ) : ?>
@@ -65,7 +64,7 @@ $is_visible_to_visitors = (bool) get_option( 'laterpay_is_in_visible_test_mode' 
             </a>
     </div>
     <?php endif; ?>
-    <?php if( ! $is_in_live_mode && ! $is_visible_to_visitors ): ?>
+    <?php if( ! $is_in_live_mode ): ?>
     <p class="account_setup_warning" data-icon="n">
         <?php
         printf( '%1s <a href="%2$s">%3$s</a> %4$s',
@@ -129,7 +128,7 @@ $is_visible_to_visitors = (bool) get_option( 'laterpay_is_in_visible_test_mode' 
             <label class="lp_badge lp_badge--revenue-model lp_tooltip lp_mt-
                     <?php if ( $laterpay['post_revenue_model'] === 'sis' ) { echo 'lp_is-selected'; } ?>
                     <?php if ( in_array( $laterpay['post_price_type'], array( LaterPay_Helper_Pricing::TYPE_INDIVIDUAL_PRICE, LaterPay_Helper_Pricing::TYPE_INDIVIDUAL_DYNAMIC_PRICE ), true ) ) : ?>
-                        <?php if ( $laterpay['price'] < $laterpay['currency']['sis_min'] ) { echo 'lp_is-disabled'; } ?>
+                        <?php if ( $laterpay['price'] < $laterpay['currency']['sis_min_limit'] ) { echo 'lp_is-disabled'; } ?>
                     <?php else : ?>
                         <?php if ( $laterpay['post_revenue_model'] !== 'sis' ) { echo 'lp_is-disabled'; } ?>
                     <?php endif; ?>"
