@@ -31,6 +31,11 @@ class WPcom_Thumbnail_Editor {
 	public $image_ratio_map = array();
 
 	/**
+	 * Default settings for allowing private blogs to use this plugin.
+	 */
+	public $allow_private_blogs = false;
+
+	/**
 	 * Initialize the class by registering various hooks.
 	 */
 	function __construct() {
@@ -39,9 +44,14 @@ class WPcom_Thumbnail_Editor {
 			'image_ratio_map' => false,
 		) );
 
+		// Allow for private blogs to use this plugin
+		$this->allow_private_blogs = apply_filters( 'wpcom_thumbnail_editor_allow_private_blogs', $this->allow_private_blogs );
+
 		// When a thumbnail is requested, intercept the request and return the custom thumbnail
-		if ( ! function_exists( 'is_private_blog' ) || ( function_exists( 'is_private_blog' ) && ! is_private_blog() ) )
+		if ( ! function_exists( 'is_private_blog' ) || ( function_exists( 'is_private_blog' )
+			&& ( ! is_private_blog() || true === $this->allow_private_blogs ) ) ) {
 			add_filter( 'image_downsize', array( &$this, 'get_thumbnail_url' ), 15, 3 );
+		}
 
 		// Admin-only hooks
 		if ( is_admin() ) {
@@ -147,7 +157,7 @@ class WPcom_Thumbnail_Editor {
 			return '<p>' . __( 'No thumbnail sizes could be found that are cropped. For now this functionality only supports cropped thumbnails.', 'wpcom-thumbnail-editor' ) . '</p>';
 
 		// Photon has to be able to access the source images
-		if ( function_exists( 'is_private_blog' ) && is_private_blog() ) {
+		if ( function_exists( 'is_private_blog' ) && is_private_blog() && true !== $this->allow_private_blogs ) {
 			return '<p>' . sprintf( __( "The WordPress.com VIP custom thumbnail cropping functionality doesn't work on sites <a href='%s'>marked as private</a>.", 'wpcom-thumbnail-editor' ), admin_url( 'options-reading.php' ) ) . '</p>';
 		} elseif ( 'localhost' == $_SERVER['HTTP_HOST'] ) {
 			return '<p>' . __( "The WordPress.com VIP custom thumbnail cropping functionality needs the images be publicly accessible in order to work, which isn't possible when you're developing locally.", 'wpcom-thumbnail-editor' ) . '</p>';
@@ -167,6 +177,7 @@ class WPcom_Thumbnail_Editor {
 			foreach ( $sizes as $key => $size ) {
 
 				$image_name = $this->use_ratio_map ? $key : $size;
+				$image_name = apply_filters( 'wpcom_thumbnail_editor_image_name', $image_name, $key, $size, $this->use_ratio_map );
 
 				$edit_url = admin_url( 'admin.php?action=wpcom_thumbnail_edit&id=' . intval( $attachment->ID ) . '&size=' . urlencode( $size ) );
 
@@ -179,10 +190,14 @@ class WPcom_Thumbnail_Editor {
 				$thumbnail = image_downsize( $attachment->ID, $size );
 
 				// Resize the thumbnail to fit into a small box so it's displayed at a reasonable size
-				if( function_exists( 'jetpack_photon_url' ) )
-					$thumbnail_url = jetpack_photon_url( $thumbnail[0], array( 'fit' => array( 250, 250 ) ) );
-				else
+				if( function_exists( 'jetpack_photon_url' ) ) {
+					$thumbnail_url = jetpack_photon_url(
+						$thumbnail[0],
+						apply_filters( 'wpcom_thumbnail_editor_preview_args', array( 'fit' => array( 250, 250 ) ), $attachment->ID, $size )
+					);
+				} else {
 					$thumbnail_url = $thumbnail[0];
+				}
 
 				$html .= '<div style="float:left;margin:0 20px 20px 0;min-width:250px;">';
 					$html .= '<a href="' . esc_url( $edit_url ) . '"';
@@ -234,7 +249,7 @@ class WPcom_Thumbnail_Editor {
 		wp_enqueue_script( 'imgareaselect' );
 		wp_enqueue_style( 'imgareaselect' );
 
-		require_once( ABSPATH . '/wp-admin/admin-header.php' );
+		require( ABSPATH . '/wp-admin/admin-header.php' );
 
 
 		$original_aspect_ratio  = $image[1] / $image[2];
@@ -359,6 +374,8 @@ class WPcom_Thumbnail_Editor {
 
 		<p><img src="<?php echo esc_url( $image[0] ); ?>" width="<?php echo (int) $image[1]; ?>" height="<?php echo (int) $image[2]; ?>" id="wpcom-thumbnail-edit" alt="<?php esc_attr( sprintf( __( '"%s" Thumbnail', 'wpcom-thumbnail-editor' ), $size ) ); ?>" /></p>
 
+		<?php do_action( 'wpcom_thumbnail_editor_edit_thumbnail_screen', $attachment->ID, $size ) ?>
+
 		<p>
 			<?php submit_button( null, 'primary', 'submit', false ); ?>
 			<?php submit_button( __( 'Reset Thumbnail', 'wpcom-thumbnail-editor' ), 'primary', 'wpcom_thumbnail_edit_reset', false ); ?>
@@ -455,6 +472,9 @@ class WPcom_Thumbnail_Editor {
 		// Save the coordinates
 		$this->save_coordinates( $attachment->ID, $size, array( $fullsize_selection_x1, $fullsize_selection_y1, $fullsize_selection_x2, $fullsize_selection_y2 ) );
 
+		// Allow for saving custom fields
+		do_action( 'wpcom_thumbnail_editor_post_handler', $attachment->ID, $size );
+
 		wp_safe_redirect( admin_url( 'media.php?action=edit&attachment_id=' . $attachment->ID . '&wteupdated=1' ) );
 		exit();
 	}
@@ -506,7 +526,7 @@ class WPcom_Thumbnail_Editor {
 			add_filter( 'intermediate_image_sizes', 'wpcom_intermediate_sizes' );
 		}
 
-		if ( $cropped_only ) {
+		if ( apply_filters( 'wpcom_thumbnail_editor_cropped_only', $cropped_only ) ) {
 			$filtered_sizes = array();
 
 			foreach ( $sizes as $size ) {
@@ -529,7 +549,7 @@ class WPcom_Thumbnail_Editor {
 			$sizes = $filtered_sizes;
 		}
 
-		return $sizes;
+		return apply_filters( 'wpcom_thumbnail_editor_get_intermediate_image_sizes', $sizes, $cropped_only );
 	}
 
 	/**
@@ -713,30 +733,34 @@ class WPcom_Thumbnail_Editor {
 	 * @return mixed Array of thumbnail details (URL, width, height, is_intermedite) or the previous data.
 	 */
 	public function get_thumbnail_url( $existing_resize, $attachment_id, $size ) {
-
-		//On dev sites, Jetpack is often active but Photon will not work because the content files are not accessible to the public internet.
-		//Right now, a broken image is displayed when this plugin is active and a thumbnail has been edited. This will allow the unmodified image to be displayed.
-		if( ! function_exists( 'jetpack_photon_url' ) ||  defined('JETPACK_DEV_DEBUG') )
+		
+		// On dev sites, Jetpack is often active but Photon will not work because the content files are not accessible to the public internet.
+		// Right now, a broken image is displayed when this plugin is active and a thumbnail has been edited. This will allow the unmodified image to be displayed.
+		if ( ! function_exists( 'jetpack_photon_url' ) || ( true === defined( 'JETPACK_DEV_DEBUG' ) && true === constant( 'JETPACK_DEV_DEBUG' ) ) ) {
 			return $existing_resize;
-
+		}
+			
 		// Named sizes only
-		if ( is_array( $size ) )
+		if ( is_array( $size ) ) {
 			return $existing_resize;
+		}
 
 		$coordinates = $this->get_coordinates( $attachment_id, $size );
 
-		if ( ! $coordinates || ! is_array( $coordinates ) || 4 != count( $coordinates ) )
+		if ( ! $coordinates || ! is_array( $coordinates ) || 4 != count( $coordinates ) ) {
 			return $existing_resize;
+		}
 
-		if ( ! $thumbnail_size = $this->get_thumbnail_dimensions( $size ) )
+		if ( ! $thumbnail_size = $this->get_thumbnail_dimensions( $size ) ) {
 			return $existing_resize;
+		}
 
 		list( $selection_x1, $selection_y1, $selection_x2, $selection_y2 ) = $coordinates;
 
-		if( function_exists( 'jetpack_photon_url' ) )
+		if ( function_exists( 'jetpack_photon_url' ) ) {
 			$url = jetpack_photon_url(
 				wp_get_attachment_url( $attachment_id ),
-				array(
+				apply_filters( 'wpcom_thumbnail_editor_thumbnail_args', array(
 					'crop' => array(
 						$selection_x1 . 'px',
 						$selection_y1 . 'px',
@@ -747,10 +771,11 @@ class WPcom_Thumbnail_Editor {
 						$thumbnail_size['width'],
 						$thumbnail_size['height'],
 					),
-				)
+				), $attachment_id, $size, $thumbnail_size )
 			);
-		else
+		} else {
 			$url = wp_get_attachment_url( $attachment_id );
+		}
 
 		return array( $url, $thumbnail_size['width'], $thumbnail_size['height'], true );
 	}
