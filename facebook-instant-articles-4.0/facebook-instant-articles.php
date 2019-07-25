@@ -406,7 +406,15 @@ if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
 		if (isset( $_GET[ 'ia_markup' ] ) && $_GET[ 'ia_markup' ]) {
 			// Transform the post to an Instant Article.
 			$adapter = new Instant_Articles_Post( $post );
-			$article = $adapter->to_instant_article();
+			// VIP: catch validation errors
+			try {
+				$article = $adapter->to_instant_article();
+			} catch ( Exception $e ) {
+				// VIP: silence validation errors and exit
+				if ( ! is_object( $article ) || ! method_exists( $article, 'render' ) ) {
+					die();
+				}
+			}
 			echo $article->render( null, true );
 
 			die();
