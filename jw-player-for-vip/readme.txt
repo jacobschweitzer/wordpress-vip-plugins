@@ -1,42 +1,66 @@
 === JW Player for Wordpress - VIP ===
 Contributors: jwplayer, ghera74
 Tags: jw player, jw player 7, jw player 8, jwplayer, jwplayer 7, jwplayer 8, video, embed video, youtube, video preroll, video chapters, video subtitles
-Version: 2.0.0
+Version: 2.0.1
 Requires at least: 4.0
-Tested up to: 5
+Tested up to: 5.2
 License: GPLv2
 
-JW Player for Wordpress - VIP is the complete solution for using JW Player into Wordpress.
-It works with the latest version of the famous video player and it gives you full control of all the options available.
-Player customization, social sharing and advertising are just an example.
+**JW Player for Wordpress - VIP** is the complete solution for using JW Player into Wordpress.
+It works with the latest version of world’s most popular video player and enables full power of the JW Player dashboard and APIs directly into your WordPress CMS.
+Enable player customization, related videos, social sharing and advertising directly into your content management system to speed up your video workflow.
 
 
 == Description ==
+
 **JW Player for Wordpress - VIP** is the complete solution for using JW Player into Wordpress.
-It works with the latest version of the famous video player and it gives you full control of all the options available.
-Player customization, social sharing and advertising are just an example.
+It works with the latest version of world’s most popular video player and enables full power of the JW Player dashboard and APIs directly into your WordPress CMS.
+Enable player customization, related videos, social sharing and advertising directly into your content management system to speed up your video workflow.
+
+**NEW ON THIS VERSION!**
+
+* JW Player dashboard connection via API Key and Secret
+* Select and publish videos hosted on JW Player
+* Select and publish playlists hosted on JW Player
+* Select and use a specific player for individual video embeds
+* Secure video URLs
+* Secure player embeds
+* Customize playlists
+* Unlimited ad tags
+* Select a specific ad tag for every single video
+* Video player bidding support with SpotX
+* Possibility to use an advertising embed block variable
+* Video / Playlist description
+* Video / Playlist thumbnail
+* Support shortcodes like *[jwplayer fPHnET5D]*
+* WP Coding Sandard 
 
 JW Player for Wordpress - VIP can be used with the cloud or even the self-hosted version of the player.<br>
 
 **Cloud**
-* Register a JW Player account at https://www.jwplayer.com/sign-up/
+
+* Register a JW Player account at https://www.jwplayer.com/pricing/
 * Once you're logged in, copy your **Cloud Hosted Player Libraries** from https://dashboard.jwplayer.com/#/players/downloads
 * Paste your library url to the plugin options page.
 
 **Self hosted**
-* Register a JW Player account at https://www.jwplayer.com/sign-up/
+
+* Register a JW Player account at https://www.jwplayer.com/pricing/
 * Once you're logged in, download the player and copy your Licence key from https://dashboard.jwplayer.com/#/players/downloads
 * Upload the folder to your site
-* Add the full url of **jwplayer.js** that you just uploaded, in the plugin options page; it will be something like https://example.com/FOLDER-UPLOADED/jwplayer.js
+* Add the full url of jwplayer.js in the plugin options page (ex. https://example.com/FOLDER-UPLOADED/jwplayer.js)
 * Paste your Licence Key to the admin page of the plugin.
 
-After that, set your general preferences, choose the post types where you want to add videos and start to add content using the **JW Player for Wordpress** box that you'll find there.<br>
-Just add the url of your self-hosted video, YouTube video or MP3.<br>
-That's all, you're ready to go!
+After that, set your general preferences, choose the post types where you want to add videos and start to add content using the JW Player for WordPress box that you’ll find there. Just add the url of your self-hosted video or select cloud-hosted content from n your JW Player Dashboard.
+ 
+That’s it, you’re ready to go!
+
+
 
 == Installation ==
+
 * Download JW Player for Wordpress - VIP
-* Upload the 'jw-player-for-vip’ directory to your '/wp-content/plugins/' directory, using your favorite method (ftp, sftp, scp, etc...)
+* Upload the 'jw-player-7-for-wp-VIP’ directory to your '/wp-content/plugins/' directory, using your favorite method (ftp, sftp, scp, etc...)
 * Activate JW Player for Wordpress - VIP from your Plugins page.
 * Once Activated, go to <strong>JW Player</strong> menu and set you preferences.
 
@@ -44,10 +68,41 @@ That's all, you're ready to go!
 == Changelog ==
 
 
-= 2.0.0 =
-Release Date: xxxxxxxx
+= 2.0.1 =
+Release Date: 05 August 2019
 
-* xxxxxxxx : xxxxxxxx
+* Bug fix : Plugin activation function hooked at setup_theme
+
+
+= 2.0.0 =
+Release Date: 30 May 2019
+
+* Enhancement : JW Player dashboard connection by API Key and Secret
+* Enhancement : Select and publish videos hosted on JW Player
+* Enhancement : Select and publish playlist hosted on JW Player
+* Enhancement : For every embeded video, select and use a specific player set on JW Player
+* Enhancement : Secure video URLs
+* Enhancement : Secure player embeds
+* Enhancement : Playlist carousel customizable
+* Enhancement : Facebook Instant Articles support
+* Enhancement : Unlimited ad tags
+* Enhancement : Select a specific ad tag for every single video
+* Enhancement : Player bidding support with SpotX
+* Enhancement : Possibility to use an advertising embed block variable
+* Enhancement : Video/ Playlist description in meta box
+* Enhancement : Video/ Playlist thumbanil in meta box
+* Enhancement : Support shortcodes like *[jwplayer fPHnET5D]*
+* Enhancement : WP Coding Sandard 
+
+
+= 1.5.4 =
+Release Date: 6 Mar 2019
+* Bug Fix: 	   Fields disabled in plugin options page.
+
+
+= 1.5.3 =
+Release Date: 8 Dec 2018
+* Bug Fix: 	   Add/ Delete video buttons not visible in Wordpress 5.0
 
 
 = 1.5.2 =

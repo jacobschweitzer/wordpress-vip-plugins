@@ -6,7 +6,7 @@
  * It works with the latest version of the famous video player and it gives you full control of all the options available.
  * Player customization, social sharing and advertising are just an example.
  * Author: JW Player
- * Version: 2.0.0
+ * Version: 2.0.1
  * Author URI: https://www.jwplayer.com/
  * Requires at least: 4.0
  * Tested up to: 5
@@ -20,12 +20,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*Define the plugin version*/
-define( 'JWPPP_VERSION', '2.0.0' );
+define( 'JWPPP_VERSION', '2.0.1' );
 
 /**
  * Fired on the activation.
  */
-function jwppp_premium_load() {
+function jwppp_vip_load() {
 
 	if ( ! function_exists( 'is_plugin_active' ) ) {
 		require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
@@ -51,4 +51,4 @@ function jwppp_premium_load() {
 	include( JWPPP_DIR . 'jw-widget/jwppp-carousel-config.php' );
 
 }
-add_action( 'plugins_loaded', 'jwppp_premium_load', 1 );
+add_action( 'setup_theme', 'jwppp_vip_load' );
