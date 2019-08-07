@@ -3,10 +3,10 @@
 **************************************************************************
 
 Plugin Name:  WordPress.com Thumbnail Editor
+Version:      1.0.0
 Description:  Since thumbnails are generated on-demand on WordPress.com, thumbnail cropping location must be set via the URL. This plugin assists in doing this. Based on concepts by Imran Nathani of <a href="http://metronews.ca/">Metro News Canada</a>.
 Author:       Automattic
-Author URI:   http://vip.wordpress.com/
-Version:      1.0
+Author URI:   https://wpvip.com/
 
 **************************************************************************/
 
@@ -356,9 +356,11 @@ class WPcom_Thumbnail_Editor {
 					onInit: function ( img, selection ) {
 						update_preview( img, selection );
 						$('#wpcom-thumbnail-edit-preview').show();
+						$('#wpcom-thumbnail-edit').trigger('wpcom_thumbnail_edit_init');
 					},
 					onSelectChange: function ( img, selection ) {
 						update_preview( img, selection );
+						$('#wpcom-thumbnail-edit').trigger('wpcom_thumbnail_edit_change');
 					},
 
 					// Fill the hidden fields with the selected coordinates for the form
@@ -367,6 +369,7 @@ class WPcom_Thumbnail_Editor {
 						$('input[name="wpcom_thumbnail_edit_y1"]').val(selection.y1);
 						$('input[name="wpcom_thumbnail_edit_x2"]').val(selection.x2);
 						$('input[name="wpcom_thumbnail_edit_y2"]').val(selection.y2);
+						$('#wpcom-thumbnail-edit').trigger('wpcom_thumbnail_edit_selectend');
 					}
 				});
 			});
@@ -733,13 +736,13 @@ class WPcom_Thumbnail_Editor {
 	 * @return mixed Array of thumbnail details (URL, width, height, is_intermedite) or the previous data.
 	 */
 	public function get_thumbnail_url( $existing_resize, $attachment_id, $size ) {
-		
+
 		// On dev sites, Jetpack is often active but Photon will not work because the content files are not accessible to the public internet.
 		// Right now, a broken image is displayed when this plugin is active and a thumbnail has been edited. This will allow the unmodified image to be displayed.
 		if ( ! function_exists( 'jetpack_photon_url' ) || ( true === defined( 'JETPACK_DEV_DEBUG' ) && true === constant( 'JETPACK_DEV_DEBUG' ) ) ) {
 			return $existing_resize;
 		}
-			
+
 		// Named sizes only
 		if ( is_array( $size ) ) {
 			return $existing_resize;
