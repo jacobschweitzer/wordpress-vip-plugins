@@ -5,7 +5,7 @@
  * Description: Shut down your site for a little while and do some maintenance on it!
  * Author: Automattic / WordPress.com VIP
  * Author URI: https://vip.wordpress.com
- * Version: 0.2.1
+ * Version: 0.2.2
  * License: GPLv2
  * Text Domain: maintenance-mode
  * Domain Path: /languages
@@ -95,6 +95,8 @@ function vip_maintenance_mode_template_redirect() {
 		}
 	}
 
+	header( 'X-Maintenance-Mode-WP: true' );
+	
 	if ( locate_template( 'template-maintenance-mode.php' ) ) {
 		get_template_part( 'template-maintenance-mode' );
 	} else {
@@ -114,21 +116,21 @@ function vip_maintenance_mode_restrict_rest_api( $result ) {
 		return $result;
 	}
 
-	$error_message = apply_filters( 'vip_maintenance_mode_rest_api_error_message', __( 'REST API access is currently restricted while we refresh things a bit.', 'maintenance-mode' ) );
-	$unauthorized_error = new WP_Error(
-		'vip_maintenance_mode_rest_not_logged_in',
+	$error_message = apply_filters( 'vip_maintenance_mode_rest_api_error_message', __( 'REST API access is currently restricted while this site is undergoing maintenance.', 'maintenance-mode' ) );
+	$maintenace_rest_error = new WP_Error(
+		'vip_maintenance_mode_rest_error',
 		$error_message,
 		array(
-			'status' => 401,
+			'status' => 503,
 		)
 	);
 
 	if ( ! is_user_logged_in() ) {
-		return $unauthorized_error;
+		return $maintenace_rest_error;
 	}
 
 	if ( ! current_user_can_bypass_vip_maintenance_mode() ) {
-		return $unauthorized_error;
+		return $maintenace_rest_error;
 	}
 
 	return $result;
