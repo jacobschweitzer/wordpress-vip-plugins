@@ -890,7 +890,8 @@ class CoAuthors_Plus {
 
 		// Best way to persist order
 		if ( $append ) {
-			$existing_coauthors = wp_list_pluck( get_coauthors( $post_id ), 'user_login' );
+			$field              = apply_filters( 'coauthors_post_list_pluck_field', 'user_login' );
+			$existing_coauthors = wp_list_pluck( get_coauthors( $post_id ), $field );
 		} else {
 			$existing_coauthors = array();
 		}
@@ -910,7 +911,8 @@ class CoAuthors_Plus {
 		$coauthor_objects = array();
 		foreach ( $coauthors as &$author_name ) {
 
-			$author = $this->get_coauthor_by( 'user_nicename', $author_name );
+			$field  = apply_filters( 'coauthors_post_get_coauthor_by_field', 'user_nicename', $author_name );
+			$author = $this->get_coauthor_by( $field, $author_name );
 			$coauthor_objects[] = $author;
 			$term = $this->update_author_term( $author );
 			$author_name = $term->slug;
@@ -1013,6 +1015,9 @@ class CoAuthors_Plus {
 						break;
 					case 'tt_ids' :
 						$terms[] = $author->term_taxonomy_id;
+						break;
+					case 'ids':
+						$terms[] = (int) $author->term_id;
 						break;
 					case 'all' :
 					default :
@@ -1254,7 +1259,7 @@ class CoAuthors_Plus {
 		$ignored_authors = apply_filters( 'coauthors_edit_ignored_authors', $ignored_authors );
 		foreach ( $found_users as $key => $found_user ) {
 			// Make sure the user is contributor and above (or a custom cap)
-			if ( in_array( $found_user->user_nicename, $ignored_authors ) ) { //AJAX sends a list of already present *users_nicenames*
+			if ( in_array( $found_user->user_nicename, $ignored_authors, true ) ) { // AJAX sends a list of already present *users_nicenames*
 				unset( $found_users[ $key ] );
 			} else if ( 'wpuser' === $found_user->type && false === $found_user->has_cap( apply_filters( 'coauthors_edit_author_cap', 'edit_posts' ) ) ) {
 				unset( $found_users[ $key ] );
