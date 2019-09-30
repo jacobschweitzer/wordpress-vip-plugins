@@ -68,7 +68,7 @@ if ( ! function_exists( 'es_get_posts' ) ) {
  * @return void
  */
 function es_wp_query_load_adapter( $adapter ) {
-	if ( in_array( $adapter, array( 'searchpress', 'wpcom-vip', 'travis' ) ) ) {
+	if ( in_array( $adapter, array( 'searchpress', 'wpcom-vip', 'travis', 'jetpack-search' ) ) ) {
 		require_once( ES_WP_QUERY_PATH . "/adapters/{$adapter}.php" );
 	}
 }
