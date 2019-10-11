@@ -288,11 +288,15 @@ class Metro_Sitemap {
 	public static function get_post_year_range() {
 		global $wpdb;
 
-		$oldest_post_date_gmt = $wpdb->get_var( "SELECT post_date FROM $wpdb->posts WHERE post_status = 'publish' ORDER BY post_date ASC LIMIT 1" );
-		$oldest_post_year = date( 'Y', strtotime( $oldest_post_date_gmt ) );
-		$current_year = date( 'Y' );
+		$oldest_post_date_year = $wpdb->get_var( "SELECT DISTINCT YEAR(post_date) as year FROM $wpdb->posts WHERE post_status = 'publish' ORDER BY year ASC LIMIT 1" );
 
-		return range( $oldest_post_year, $current_year );
+		if ( null !== $oldest_post_date_year ) {
+			$current_year = date( 'Y' );
+			return range( (int) $oldest_post_date_year, $current_year );
+		}
+
+		return array();
+
 	}
 
 	/**
